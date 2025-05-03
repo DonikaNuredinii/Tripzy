@@ -40,8 +40,8 @@ return [
     'host' => env('DB_HOST', 'localhost'),
     'port' => env('DB_PORT', '1433'),
     'database' => env('DB_DATABASE', 'forge'),
-    'username' => '',
-    'password' => '',
+    'username' => env('DB_USERNAME', ''), // Leave this empty to use Windows Auth
+    'password' => env('DB_PASSWORD', ''), // Leave this empty to use Windows Auth
     'charset' => 'utf8',
     'prefix' => '',
     'trust_server_certificate' => true,
@@ -49,6 +49,7 @@ return [
         PDO::SQLSRV_ATTR_ENCODING => PDO::SQLSRV_ENCODING_UTF8,
     ]) : [],
 ],
+
 
 
     ],
