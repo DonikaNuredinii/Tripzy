@@ -1,6 +1,5 @@
 import React from "react";
 import { ParallaxProvider, Parallax } from "react-scroll-parallax";
-import travelVideo from "../Images/9907159-uhd_4096_2160_25fps.mp4";
 import "../CSS/Style.css";
 import NavBar from "../Components/Navbar";
 import AuthForms from "../Components/AuthForms ";
@@ -21,7 +20,10 @@ const LandingPage = () => {
                   loop
                   playsInline
                 >
-                  <source src={travelVideo} type="video/mp4" />
+                  <source
+                    src="/Images/9907159-uhd_4096_2160_25fps.mp4"
+                    type="video/mp4"
+                  />
                 </video>
               </div>
             </Parallax>
