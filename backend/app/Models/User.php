@@ -2,43 +2,91 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\Hash;
 
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+    protected $primaryKey = 'Userid';
+
+    public const CREATED_AT = 'Created_At';
+    public const UPDATED_AT = 'Updated_At';
+
     protected $fillable = [
-        'name',
-        'email',
-        'password',
+        'Name',
+        'Lastname',
+        'Email',
+        'Password',
+        'Bio',
+        'Profile_photo',
+        'Birthdate',
+        'Gender',
+        'Country',
+        'Verified',
+        'Created_At',
+        'Updated_At',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
-        'password',
+        'Password',
         'remember_token',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'Birthdate'         => 'date',
+        'Verified'          => 'boolean',
+        'Created_At'        => 'datetime',
+        'Updated_At'        => 'datetime',
     ];
+
+    // Automatically hash password
+    public function setPasswordAttribute($value)
+    {
+        if (!empty($value)) {
+            $this->attributes['Password'] = Hash::needsRehash($value) ? Hash::make($value) : $value;
+        }
+    }
+
+    // Relationships
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class, 'Userid', 'Userid');
+    }
+
+    public function documents()
+    {
+        return $this->hasMany(UserIdDocument::class, 'Userid');
+    }
+
+    public function sentMessages()
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+
+    public function receivedMessages()
+    {
+        return $this->hasMany(Message::class, 'receiver_id');
+    }
+
+    public function trips()
+    {
+        return $this->hasMany(Trip::class, 'Userid');
+    }
+
+    public function tripComments()
+    {
+        return $this->hasMany(TripComment::class, 'Userid');
+    }
+
+    public function tripMatches()
+    {
+        return $this->hasMany(TripMatch::class, 'Userid');
+    }
 }

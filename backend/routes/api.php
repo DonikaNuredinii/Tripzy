@@ -7,15 +7,18 @@ use App\Http\Controllers\TripMatchController;
 use App\Http\Controllers\TripCommentController;
 use App\Http\Controllers\TripPhotoController;
 use App\Http\Controllers\CountryController;
+use App\Http\Controllers\UserController;
 
 Route::apiResource('trips', TripController::class);
 Route::apiResource('trip-matches', TripMatchController::class);
 Route::apiResource('trip-comments', TripCommentController::class);
 Route::apiResource('trip-photos', TripPhotoController::class);
 Route::apiResource('countries', CountryController::class);
+Route::apiResource('users', UserController::class);
 
 
 /*
+
 |--------------------------------------------------------------------------
 | API Routes
 |--------------------------------------------------------------------------
@@ -28,4 +31,8 @@ Route::apiResource('countries', CountryController::class);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+Route::get('/test-api', function () {
+    return response()->json(['status' => 'API working']);
 });
