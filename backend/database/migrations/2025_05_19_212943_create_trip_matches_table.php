@@ -23,7 +23,8 @@ return new class extends Migration
 
             // Lidhje me tabelën users, por pa cascade për të shmangur "multiple cascade paths"
             $table->unsignedBigInteger('Userid');
-            $table->foreign('Userid')->references('id')->on('users')->onDelete('NO ACTION');
+            $table->foreign('Userid')->references('Userid')->on('users')->onDelete('NO ACTION');
+
 
             $table->string('Status');
             $table->dateTime('created_at')->default(DB::raw('GETDATE()'));

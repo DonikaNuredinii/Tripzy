@@ -25,9 +25,19 @@ class UserController extends Controller
             'Email' => 'required|email|unique:users,Email',
             'Password' => 'required|min:6',
         ]);
-
-        return User::create($validated);
+    
+        // Create user
+        $user = User::create($validated);
+    
+        // Automatically assign "user" role
+        $user->role()->create([
+            'Name' => 'user'
+        ]);
+    
+        // Return user with role info
+        return $user->load('role');
     }
+
 
     public function update(Request $request, $id)
     {

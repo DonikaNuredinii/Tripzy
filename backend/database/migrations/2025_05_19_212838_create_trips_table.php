@@ -29,7 +29,8 @@ return new class extends Migration
             $table->dateTime('created_at')->default(DB::raw('GETDATE()'));
             $table->dateTime('updated_at')->nullable();
 
-            $table->foreign('Userid')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('Userid')->references('Userid')->on('users')->onDelete('cascade');
+
         });
     }
 

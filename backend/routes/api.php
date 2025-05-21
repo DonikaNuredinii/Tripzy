@@ -8,6 +8,7 @@ use App\Http\Controllers\TripCommentController;
 use App\Http\Controllers\TripPhotoController;
 use App\Http\Controllers\CountryController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\RoleController;
 
 Route::apiResource('trips', TripController::class);
 Route::apiResource('trip-matches', TripMatchController::class);
@@ -15,6 +16,7 @@ Route::apiResource('trip-comments', TripCommentController::class);
 Route::apiResource('trip-photos', TripPhotoController::class);
 Route::apiResource('countries', CountryController::class);
 Route::apiResource('users', UserController::class);
+Route::apiResource('roles', RoleController::class);
 
 
 /*

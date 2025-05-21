@@ -55,10 +55,7 @@ class User extends Authenticatable
 
     // Relationships
 
-    public function role()
-    {
-        return $this->belongsTo(Role::class, 'Userid', 'Userid');
-    }
+    
 
     public function documents()
     {
@@ -89,4 +86,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(TripMatch::class, 'Userid');
     }
+
+    public function role()
+    {
+        return $this->hasOne(Role::class, 'Userid');
+    }
+
+
+
 }

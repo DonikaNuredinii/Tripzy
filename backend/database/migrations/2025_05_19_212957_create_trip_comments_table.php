@@ -24,7 +24,7 @@ return new class extends Migration
             $table->foreign('Tripid')->references('Tripid')->on('trips')->onDelete('cascade');
 
             // përdor NO ACTION për MSSQL
-            $table->foreign('Userid')->references('id')->on('users')->onDelete('NO ACTION');
+            $table->foreign('Userid')->references('Userid')->on('users')->onDelete('NO ACTION');
         });
     }
 
