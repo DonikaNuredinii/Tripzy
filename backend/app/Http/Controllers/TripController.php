@@ -15,22 +15,39 @@ class TripController extends Controller
 
     // POST /api/trips
     public function store(Request $request)
-    {
-        $data = $request->validate([
-            'Userid' => 'required|exists:users,id',
-            'title' => 'required|string',
-            'Description' => 'required|string',
-            'Destination_country' => 'required|string',
-            'Destination_city' => 'required|string',
-            'Departuredate' => 'required|date',
-            'Return_date' => 'required|date|after_or_equal:Departuredate',
-            'Travel_STYLE' => 'required|string',
-            'Budget_estimated' => 'required|numeric',
-            'Looking_for' => 'required|string',
-        ]);
+{
+    $data = $request->validate([
+        'Userid' => 'required|exists:users,Userid',
+        'title' => 'required|string',
+        'Description' => 'required|string',
+        'Destination_country' => 'required|string',
+        'Destination_city' => 'required|string',
+        'Departuredate' => 'required|date',
+        'Return_date' => 'required|date|after_or_equal:Departuredate',
+        'Travel_STYLE' => 'required|string',
+        'Budget_estimated' => 'required|numeric',
+        'Looking_for' => 'required|string',
+        'photos.*' => 'image|mimes:jpg,jpeg,png|max:2048',
+    ]);
 
-        return Trip::create($data);
+    $trip = Trip::create($data);
+
+    if ($request->hasFile('photos')) {
+        foreach ($request->file('photos') as $photo) {
+            $path = $photo->store('trip_photos', 'public');
+            \App\Models\TripPhoto::create([
+                'Tripid' => $trip->Tripid,
+                'image_path' => $path,
+            ]);
+        }
     }
+
+    return response()->json([
+        'message' => 'Trip created',
+        'trip' => $trip->load('photos')
+    ]);
+}
+
 
     // GET /api/trips/{id}
     public function show($id)

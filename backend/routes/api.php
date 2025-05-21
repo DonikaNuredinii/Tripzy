@@ -20,6 +20,8 @@ Route::apiResource('users', UserController::class);
 Route::apiResource('roles', RoleController::class);
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login',    [AuthController::class, 'login']);
+Route::apiResource('roles', RoleController::class);
+
 
 
 /*
@@ -41,8 +43,13 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::get('/test-api', function () {
     return response()->json(['status' => 'API working']);
 });
+Route::get('/trips', [TripController::class, 'index']);
+Route::get('/trips/{trip}', [TripController::class, 'show']);
 
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
+      Route::post('/trips', [TripController::class, 'store']);
+      Route::put('/trips/{trip}', [TripController::class, 'update']);
+      Route::delete('/trips/{trip}', [TripController::class, 'destroy']);
+      Route::post('/logout', [AuthController::class, 'logout']);
 });

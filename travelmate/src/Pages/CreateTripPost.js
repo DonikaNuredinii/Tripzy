@@ -48,6 +48,7 @@ const CreateTripPost = () => {
       photos: [...prev.photos, ...files],
     }));
   };
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (!selectedImage) return;
@@ -72,6 +73,65 @@ const CreateTripPost = () => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [selectedImage, trip.photos]);
+
+  const handleSubmit = async () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const token = localStorage.getItem("token");
+
+    if (!user || !token) {
+      alert("Please log in first.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("Userid", user.Userid);
+    formData.append("title", "My Trip"); 
+    formData.append("Description", trip.description);
+    formData.append("Destination_country", trip.destinationCountry);
+    formData.append("Destination_city", trip.destinationCity);
+    formData.append("Departuredate", trip.departureDate);
+    formData.append("Return_date", trip.returnDate);
+    formData.append("Travel_STYLE", trip.travelStyle);
+    formData.append("Budget_estimated", trip.budget);
+    formData.append("Looking_for", trip.lookingFor);
+
+    trip.photos.forEach((photo) => {
+      formData.append("photos[]", photo);
+    });
+
+    try {
+      const res = await fetch("http://localhost:8000/api/trips", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert("Trip created successfully!");
+        setTrip({
+          description: "",
+          destinationCountry: "",
+          destinationCity: "",
+          departureDate: "",
+          returnDate: "",
+          travelStyle: "",
+          budget: "",
+          lookingFor: "",
+          photos: [],
+        });
+      } else {
+        console.error("Error:", data);
+        alert("Error posting trip.");
+      }
+    } catch (err) {
+      console.error("Submit failed:", err);
+      alert("Something went wrong.");
+    }
+  };
 
   return (
     <div className="trip-post">
@@ -199,7 +259,9 @@ const CreateTripPost = () => {
         />
       </div>
 
-      <button className="post-button">Post</button>
+      <button className="post-button" onClick={handleSubmit}>
+        Post
+      </button>
 
       {/* Image Modal */}
       {selectedImage && (
