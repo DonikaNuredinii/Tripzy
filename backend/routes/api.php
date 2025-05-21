@@ -10,6 +10,7 @@ use App\Http\Controllers\CountryController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\MessageController;
 
 Route::apiResource('trips', TripController::class);
 Route::apiResource('trip-matches', TripMatchController::class);
@@ -21,6 +22,9 @@ Route::apiResource('roles', RoleController::class);
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login',    [AuthController::class, 'login']);
 Route::apiResource('roles', RoleController::class);
+  Route::get('/messages', [MessageController::class, 'index']);
+    Route::post('/messages', [MessageController::class, 'store']);
+
 
 
 
