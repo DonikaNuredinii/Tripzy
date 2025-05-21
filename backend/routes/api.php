@@ -9,6 +9,7 @@ use App\Http\Controllers\TripPhotoController;
 use App\Http\Controllers\CountryController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\AuthController;
 
 Route::apiResource('trips', TripController::class);
 Route::apiResource('trip-matches', TripMatchController::class);
@@ -17,6 +18,8 @@ Route::apiResource('trip-photos', TripPhotoController::class);
 Route::apiResource('countries', CountryController::class);
 Route::apiResource('users', UserController::class);
 Route::apiResource('roles', RoleController::class);
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login',    [AuthController::class, 'login']);
 
 
 /*
@@ -37,4 +40,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('/test-api', function () {
     return response()->json(['status' => 'API working']);
+});
+
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
 });

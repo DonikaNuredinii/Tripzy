@@ -29,11 +29,7 @@ class UserController extends Controller
         // Create user
         $user = User::create($validated);
     
-        // Automatically assign "user" role
-        $user->role()->create([
-            'Name' => 'user'
-        ]);
-    
+       
         // Return user with role info
         return $user->load('role');
     }

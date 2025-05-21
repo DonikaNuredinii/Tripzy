@@ -30,6 +30,7 @@ class User extends Authenticatable
         'Verified',
         'Created_At',
         'Updated_At',
+        'Roleid',
     ];
 
     protected $hidden = [
@@ -87,10 +88,10 @@ class User extends Authenticatable
         return $this->hasMany(TripMatch::class, 'Userid');
     }
 
-    public function role()
-    {
-        return $this->hasOne(Role::class, 'Userid');
-    }
+ public function role()
+{
+    return $this->belongsTo(Role::class, 'Roleid', 'Roleid');
+}
 
 
 
