@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../CSS/Style.css";
 
 const AuthForms = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const navigate = useNavigate();
   const [message, setMessage] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
@@ -77,7 +79,7 @@ const handleLoginSubmit = async (e) => {
     setUser(res.data.user);
     setIsAuthenticated(true);
     setMessage("Login successful");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+   navigate("/profile");
   } catch (err) {
     setMessage(err.response?.data?.message || "Login failed");
   }
@@ -148,7 +150,7 @@ const handleLoginSubmit = async (e) => {
               onChange={handleLoginChange}
               required
             />
-            <button type="submit">Log In</button>
+            <button className="authbutton" type="submit">Log In</button>
           </form>
           <p>
             Don't have an account?{" "}
@@ -209,7 +211,7 @@ const handleLoginSubmit = async (e) => {
               onChange={handleSignupChange}
               required
             />
-            <button type="submit">Sign Up</button>
+            <button className="authbutton" type="submit">Sign Up</button>
           </form>
           <p>
             Already have an account?{" "}
@@ -225,7 +227,7 @@ const handleLoginSubmit = async (e) => {
       {isAuthenticated && (
         <div style={{ textAlign: "center", marginTop: "1rem" }}>
           <p>Welcome, {user?.Name}!</p>
-          <button onClick={handleLogout} style={{ padding: "10px 20px" }}>
+          <button className="authbutton" onClick={handleLogout} style={{ padding: "10px 20px" }}>
             Log Out
           </button>
         </div>
@@ -235,3 +237,4 @@ const handleLoginSubmit = async (e) => {
 };
 
 export default AuthForms;
+

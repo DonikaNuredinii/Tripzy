@@ -46,3 +46,5 @@ Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logo
 Route::middleware('auth:sanctum')->get('/me', function (Request $request) {
     return $request->user()->load('role'); // Optional: include role info
 });
+
+Route::middleware('auth:sanctum')->put('/users/{id}', [UserController::class, 'update']);

@@ -33,7 +33,7 @@ class UserController extends Controller
         'Roleid'         => 'sometimes|exists:roles,Roleid',
     ]);
 
-    // Only assign default Roleid if it’s not provided
+
     if (!isset($validated['Roleid'])) {
         $validated['Roleid'] = 2;
     }
@@ -45,18 +45,37 @@ class UserController extends Controller
 
 
 
-    public function update(Request $request, $id)
-    {
-        $user = User::findOrFail($id);
-        $user->update($request->except('Password'));
+public function update(Request $request, $id)
+{
+    $user = User::findOrFail($id);
 
-        if ($request->filled('Password')) {
-            $user->Password = $request->Password;
-            $user->save();
-        }
+ 
+    $request->validate([
+        'Name'           => 'required|string|max:255',
+        'Lastname'       => 'required|string|max:255',
+        'Bio'            => 'nullable|string|max:255',
+        'Profile_photo'  => 'nullable|string',
+        'Birthdate'      => 'nullable|date',
+        'Gender'         => 'nullable|string|max:10',
+        'Country'        => 'nullable|string|max:100',
+        'Verified'       => 'boolean',
+        'Roleid'         => 'sometimes|exists:roles,Roleid',
+        'Password'       => 'nullable|string|min:6',
+    ]);
 
-        return $user;
+    
+    $user->update($request->except('Password'));
+
+
+    if ($request->filled('Password')) {
+        $user->Password = $request->Password; 
+        $user->save();
     }
+
+    return $user->load('role');
+}
+
+
 
     public function destroy($id)
     {

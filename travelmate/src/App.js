@@ -4,6 +4,9 @@ import LandingPage from "./Pages/LandingPage";
 import CreateTripPost from "./Components/CreateTripPost";
 import TripFeedC from "./Pages/Trip-FeedC";
 import MessagesPanel from "./Pages/MessagesPanel";
+import AuthForms from "./Components/AuthForms";
+import ProfilePage from "./Pages/ProfilePage";
+
 
 function App() {
   return (
@@ -13,6 +16,8 @@ function App() {
         <Route path="/trip_post" element={<CreateTripPost />} />
         <Route path="/feed" element={<TripFeedC />} />
         <Route path="/messages" element={<MessagesPanel />} />
+        <Route path="/login" element={<AuthForms />} />
+        <Route path="/profile" element={<ProfilePage />} />
       </Routes>
     </Router>
   );

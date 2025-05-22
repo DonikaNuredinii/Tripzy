@@ -2,7 +2,9 @@ import React from "react";
 import { ParallaxProvider, Parallax } from "react-scroll-parallax";
 import "../CSS/Style.css";
 import NavBar from "../Components/Navbar";
-import AuthForms from "../Components/AuthForms ";
+import AuthForms from '../Components/AuthForms';
+
+
 
 const LandingPage = () => {
   return (
