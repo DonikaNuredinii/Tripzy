@@ -1,7 +1,7 @@
 import React from "react";
 import { FiCompass, FiBell, FiUser, FiLogOut } from "react-icons/fi";
 import { MdOutlineModeOfTravel } from "react-icons/md";
-
+import { NavLink } from "react-router-dom"; // ⬅️ Use NavLink
 import "../CSS/Style.css";
 
 const NavbarFeed = () => {
@@ -11,20 +11,22 @@ const NavbarFeed = () => {
         <MdOutlineModeOfTravel />
         <h1>TRIPZY</h1>
       </div>
+
       <div className="navbar-center">
-        <a href="/feed" className="nav-link active">
+        <NavLink to="/feed" className="nav-link">
           Feed
-        </a>
-        <a href="/explore" className="nav-link">
+        </NavLink>
+        <NavLink to="/explore" className="nav-link">
           Explore
-        </a>
-        <a href="/matches" className="nav-link">
+        </NavLink>
+        <NavLink to="/matches" className="nav-link">
           Matches
-        </a>
-        <a href="/messages" className="nav-link">
+        </NavLink>
+        <NavLink to="/messages" className="nav-link">
           Messages
-        </a>
+        </NavLink>
       </div>
+
       <div className="navbar-right">
         <FiCompass className="nav-icon" />
         <FiBell className="nav-icon" />
