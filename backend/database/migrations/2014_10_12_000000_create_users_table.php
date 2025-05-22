@@ -21,8 +21,8 @@ return new class extends Migration
             $table->string('Country')->nullable();
             $table->boolean('Verified')->default(false);
             $table->timestamp('email_verified_at')->nullable();
-            $table->rememberToken(); // adds `remember_token`
-            $table->timestamps(); // adds `created_at` and `updated_at`
+            $table->rememberToken(); 
+            $table->timestamps(); 
         });
     }
 

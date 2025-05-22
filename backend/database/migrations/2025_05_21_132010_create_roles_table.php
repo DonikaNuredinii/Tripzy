@@ -8,11 +8,8 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('roles', function (Blueprint $table) {
             $table->id('Roleid'); 
-            $table->unsignedBigInteger('Userid'); 
             $table->string('Name'); 
             $table->timestamps();
-
-            $table->foreign('Userid')->references('Userid')->on('users')->onDelete('cascade');
         });
     }
 

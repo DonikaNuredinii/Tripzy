@@ -11,6 +11,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MessageController;
 
+
 // Public Trip Routes
 Route::get('/trips', [TripController::class, 'index']);
 Route::get('/trips/{trip}', [TripController::class, 'show']);
@@ -42,3 +43,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 
+Route::middleware('auth:sanctum')->get('/me', function (Request $request) {
+    return $request->user()->load('role'); // Optional: include role info
+});

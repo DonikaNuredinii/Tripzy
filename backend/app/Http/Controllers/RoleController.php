@@ -9,13 +9,12 @@ class RoleController extends Controller
 {
     public function index()
     {
-        return Role::with('user')->get();
+        return Role::all(); // No user relationship anymore
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'Userid' => 'required|exists:users,Userid',
             'Name' => 'required|string|max:255',
         ]);
 
@@ -24,7 +23,7 @@ class RoleController extends Controller
 
     public function show($id)
     {
-        return Role::with('user')->findOrFail($id);
+        return Role::findOrFail($id);
     }
 
     public function update(Request $request, $id)

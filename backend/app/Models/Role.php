@@ -12,12 +12,8 @@ class Role extends Model
     protected $primaryKey = 'Roleid';
 
     protected $fillable = [
-        'Userid',
         'Name',
     ];
 
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'Userid');
-    }
+    
 }
