@@ -34,7 +34,9 @@ const AuthForms = () => {
   try {
     const res = await axios.post("http://localhost:8000/api/login", loginData);
     setMessage("Login successful");
-    localStorage.setItem("token", res.data.access_token);
+    localStorage.setItem("token", res.data.token);
+    localStorage.setItem("user", JSON.stringify(res.data.user));
+
     setIsAuthenticated(true); // ✅ update login status
     window.scrollTo({ top: 0, behavior: "smooth" });
   } catch (err) {
