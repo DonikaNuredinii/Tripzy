@@ -7,7 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Trip extends Model
 {
+    use HasFactory;
+
     protected $primaryKey = 'Tripid';
+    public $incrementing = true;
 
     protected $fillable = [
         'Userid',
@@ -22,28 +25,29 @@ class Trip extends Model
         'Looking_for',
     ];
 
+    // Relationships
     public function user()
     {
-        return $this->belongsTo(User::class, 'Userid');
+        return $this->belongsTo(User::class, 'Userid', 'Userid');
     }
 
     public function comments()
     {
-        return $this->hasMany(TripComment::class, 'Tripid');
+        return $this->hasMany(TripComment::class, 'Tripid', 'Tripid');
     }
 
     public function photos()
     {
-        return $this->hasMany(TripPhoto::class, 'Tripid');
+        return $this->hasMany(TripPhoto::class, 'Tripid', 'Tripid');
     }
 
     public function matches()
     {
-        return $this->hasMany(TripMatch::class, 'Tripid');
+        return $this->hasMany(TripMatch::class, 'Tripid', 'Tripid');
     }
 
     public function country()
     {
-        return $this->hasOne(Country::class, 'Tripid');
+        return $this->belongsTo(Country::class, 'Destination_country', 'name');
     }
 }

@@ -32,6 +32,13 @@ html {
 .logo-icon svg {
   font-size: 1.8rem;
 }
+.logo-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: inherit;
+}
 
 .login-btn {
   background-color: #140c06;
@@ -403,8 +410,7 @@ select {
   font-size: 1rem;
 }
 
-
-.authbutton{
+.authbutton {
   padding: 0.75rem;
   background-color: #140c06;
   color: white;
@@ -431,7 +437,7 @@ select {
   cursor: pointer;
 }
 
-/* add trip post*/
+/* ===============================add trip post================================*/
 .trip-post {
   background-color: #f5f5f4;
   border-radius: 12px;
@@ -563,6 +569,9 @@ select {
   border-radius: 6px;
   object-fit: cover;
   border: 2px solid #140c06;
+}
+.description-input {
+  margin-top: 10px;
 }
 
 .file-label {
@@ -976,10 +985,6 @@ select {
   margin-bottom: 2rem;
 }
 
-
-
-
-
 /* Profile Page */
 
 /* .profile-page {
@@ -1037,7 +1042,6 @@ select {
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
 }
 
-
 .profile-settings {
   background-color: #ffffff;
   padding: 40px;
@@ -1049,7 +1053,6 @@ select {
   margin-right: 40px;
   box-sizing: border-box;
 }
-
 
 .profile-settings h2 {
   margin-bottom: 30px;
@@ -1064,7 +1067,6 @@ select {
   margin-bottom: 6px;
   color: #333;
 }
-
 
 .form-row {
   display: flex;
@@ -1086,19 +1088,16 @@ select {
   max-width: 350px;
 }
 
-
-
 .firstsection {
   display: flex;
   gap: 20px;
   flex-wrap: wrap;
 }
 
-
 .profile-settings input,
 .profile-settings textarea {
   width: 100%;
-  max-width:100%;
+  max-width: 100%;
   padding: 10px 10px;
   margin-bottom: 20px;
   border: 1px solid #ddd;
@@ -1112,7 +1111,9 @@ select {
 .profile-settings input:focus,
 .profile-settings textarea:focus {
   outline: none;
-  box-shadow: 0 8px 22px rgba(87, 87, 87, 0.1), 0 4px 32px rgba(0, 0, 0, 0.1);
+  box-shadow:
+    0 8px 22px rgba(87, 87, 87, 0.1),
+    0 4px 32px rgba(0, 0, 0, 0.1);
   background-color: #fff;
 }
 
@@ -1125,7 +1126,6 @@ select {
   color: red;
   cursor: pointer;
 }
-
 
 .logout-button {
   margin-top: 290px;
@@ -1143,7 +1143,6 @@ select {
 .logout-button:hover {
   background-color: #333;
 }
-
 
 .back-button-wrapper {
   position: absolute;
@@ -1169,11 +1168,11 @@ select {
   background-color: transparent;
 }
 
-.back-button1:hover{
+.back-button1:hover {
   color: #003366;
 }
 
-.save-button{
+.save-button {
   width: 100%;
   padding: 10px;
   background-color: #1d1d1d;
@@ -1183,4 +1182,11 @@ select {
   font-size: 16px;
   cursor: pointer;
   transition: background-color 0.2s ease;
+}
+.trip-option select {
+  width: 100%;
+  padding: 8px;
+  font-size: 0.8rem;
+  border-radius: 6px;
+  border: none;
 }

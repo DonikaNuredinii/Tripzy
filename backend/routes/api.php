@@ -10,6 +10,12 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MessageController;
+use Illuminate\Support\Facades\Log;
+
+Route::post('/debug-trip', function (Request $request) {
+    Log::info('✅ Reached /debug-trip', $request->all());
+    return response()->json(['status' => 'received']);
+});
 
 
 // Public Trip Routes

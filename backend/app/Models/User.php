@@ -13,6 +13,7 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable;
 
     protected $primaryKey = 'Userid';
+    public $incrementing = true;
 
     public const CREATED_AT = 'Created_At';
     public const UPDATED_AT = 'Updated_At';

@@ -1,5 +1,8 @@
+// src/App.jsx
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import "./App.css";
+import { AuthProvider } from "./contexts/AuthContext";
+import PrivateRoute from "./Components/PrivateRoute";
+
 import LandingPage from "./Pages/LandingPage";
 import CreateTripPost from "./Components/CreateTripPost";
 import TripFeedC from "./Pages/Trip-FeedC";
@@ -7,19 +10,51 @@ import MessagesPanel from "./Pages/MessagesPanel";
 import AuthForms from "./Components/AuthForms";
 import ProfilePage from "./Pages/ProfilePage";
 
-
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/trip_post" element={<CreateTripPost />} />
-        <Route path="/feed" element={<TripFeedC />} />
-        <Route path="/messages" element={<MessagesPanel />} />
-        <Route path="/login" element={<AuthForms />} />
-        <Route path="/profile" element={<ProfilePage />} />
-      </Routes>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          {/* Public */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<AuthForms />} />
+
+          {/* Protected */}
+          <Route
+            path="/feed"
+            element={
+              <PrivateRoute>
+                <TripFeedC />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/trip_post"
+            element={
+              <PrivateRoute>
+                <CreateTripPost />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/messages"
+            element={
+              <PrivateRoute>
+                <MessagesPanel />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute>
+                <ProfilePage />
+              </PrivateRoute>
+            }
+          />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 

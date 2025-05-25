@@ -1,32 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import "../CSS/Style.css";
 import CreateTripPost from "../Components/CreateTripPost";
 
-const sampleImage = "/Images/Hawaii.jpg";
-
-const demoTrips = [
-  {
-    id: 1,
-    user: {
-      Name: "Rrona Pajaziti",
-      Profile_photo: "/images/users/rrona.jpg",
-    },
-    Description:
-      "Sunset at the Eiffel Tower 🌇✨ Had an amazing time with new friends!",
-    Destination_country: "France",
-    Destination_city: "Paris",
-    Departuredate: "2025-04-20",
-    Return_date: "2025-04-25",
-    Travel_STYLE: "Romantic",
-    Budget_estimated: 600,
-    Looking_for: "Travel buddies",
-    photos: [sampleImage],
-    created_at: "2025-04-26T15:20:00",
-  },
-];
-
 const TripFeed = () => {
+  const [trips, setTrips] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [showPostForm, setShowPostForm] = useState(false);
+  const [error, setError] = useState("");
+
+  const fetchTrips = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.get("http://localhost:8000/api/trips", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log("Trips fetched:", res.data); // 🔍 Inspect this
+      setTrips(res.data);
+    } catch (err) {
+      console.error("Failed to fetch trips:", err);
+      setError("Failed to load trips.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTrips();
+  }, []);
 
   return (
     <div className="trip-feed">
@@ -41,56 +44,71 @@ const TripFeed = () => {
 
       {showPostForm && (
         <div className="trip-form-container">
-          <CreateTripPost />
+          <CreateTripPost onPostSuccess={fetchTrips} />
         </div>
       )}
 
-      {demoTrips.map((trip) => (
-        <div key={trip.id} className="wide-trip-card">
-          <div className="trip-content">
-            <div className="trip-text">
-              <h3>{trip.user.Name}</h3>
-              <p className="trip-destination">
-                {trip.Destination_city}, {trip.Destination_country}
-              </p>
-              <p className="trip-description">{trip.Description}</p>
-              <div className="trip-info">
-                <p>
-                  📅 <strong>Dates:</strong> {trip.Departuredate} →{" "}
-                  {trip.Return_date}
+      {loading ? (
+        <p>Loading trips...</p>
+      ) : error ? (
+        <p className="error">{error}</p>
+      ) : trips.length === 0 ? (
+        <p>No trips posted yet.</p>
+      ) : (
+        trips.map((trip) => (
+          <div key={trip.Tripid} className="wide-trip-card">
+            <div className="trip-content">
+              <div className="trip-text">
+                <h3>{trip.user?.Name || "Anonymous"}</h3>
+                <p className="trip-destination">
+                  {trip.Destination_city}, {trip.Destination_country}
                 </p>
-                <p>
-                  🧭 <strong>Style:</strong> {trip.Travel_STYLE}
-                </p>
-                <p>
-                  🧍 <strong>Looking For:</strong> {trip.Looking_for}
-                </p>
-                <p>
-                  💰 <strong>Budget:</strong> {trip.Budget_estimated} €
+                <p className="trip-description">{trip.Description}</p>
+                <div className="trip-info">
+                  <p>
+                    📅 <strong>Dates:</strong> {trip.Departuredate} →{" "}
+                    {trip.Return_date}
+                  </p>
+                  <p>
+                    🧭 <strong>Style:</strong> {trip.Travel_STYLE}
+                  </p>
+                  <p>
+                    🧍 <strong>Looking For:</strong> {trip.Looking_for}
+                  </p>
+                  <p>
+                    💰 <strong>Budget:</strong> {trip.Budget_estimated} €
+                  </p>
+                </div>
+                <p className="meta">
+                  Posted on {new Date(trip.created_at).toLocaleDateString()}
                 </p>
               </div>
-              <p className="meta">
-                Posted on {new Date(trip.created_at).toLocaleDateString()}
-              </p>
+              <div className="trip-image">
+                <img
+                  src={
+                    trip.photos?.[0]
+                      ? `http://localhost:8000/storage/${trip.photos[0].image_path}`
+                      : "/Images/default.jpg"
+                  }
+                  alt="Trip"
+                />
+              </div>
             </div>
-            <div className="trip-image">
-              <img src={trip.photos[0]} alt="Trip" />
-            </div>
-          </div>
 
-          <div className="trip-reactions">
-            <div className="likes-comments">
-              <span>👍 Laida Rusinovci and 16 others</span>
-              <span>2 comments</span>
-            </div>
-            <div className="action-buttons">
-              <button>👍 Like</button>
-              <button>💬 Comment</button>
-              <button>💞 Match</button>
+            <div className="trip-reactions">
+              <div className="likes-comments">
+                <span>👍 Laida Rusinovci and 16 others</span>
+                <span>2 comments</span>
+              </div>
+              <div className="action-buttons">
+                <button>👍 Like</button>
+                <button>💬 Comment</button>
+                <button>💞 Match</button>
+              </div>
             </div>
           </div>
-        </div>
-      ))}
+        ))
+      )}
     </div>
   );
 };

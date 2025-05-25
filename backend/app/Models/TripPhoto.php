@@ -7,14 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class TripPhoto extends Model
 {
+    use HasFactory;
+
     protected $primaryKey = 'Tripphotosid';
-    public $timestamps = false;
+    public $incrementing = true;
+    public $timestamps = false; 
 
     protected $fillable = [
         'Tripid',
         'image_path',
         'caption',
-        'created_at',
     ];
 
     public function trip()

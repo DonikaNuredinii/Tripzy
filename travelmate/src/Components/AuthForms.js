@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../CSS/Style.css";
+import { useAuth } from "../contexts/AuthContext";
 
 const AuthForms = () => {
   const [isLogin, setIsLogin] = useState(true);
-  const navigate = useNavigate();
   const [message, setMessage] = useState("");
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
+
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   const [loginData, setLoginData] = useState({ Email: "", Password: "" });
 
@@ -22,45 +23,6 @@ const AuthForms = () => {
     Birthdate: "",
   });
 
-  // ✅ Check token validity using /api/me
-  const checkToken = async () => {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      console.log("No token found");
-      return false;
-    }
-
-    try {
-      const res = await axios.get("http://localhost:8000/api/me", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      console.log("Token is valid. Logged-in user:", res.data);
-      return res.data;
-    } catch (err) {
-      console.error("Token is invalid or expired");
-      return false;
-    }
-  };
-
-  // ✅ Run on component mount
-  useEffect(() => {
-    checkToken().then((user) => {
-      if (user) {
-        setUser(user);
-        setIsAuthenticated(true);
-      } else {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        setUser(null);
-        setIsAuthenticated(false);
-      }
-    });
-  }, []);
-
   const handleLoginChange = (e) => {
     setLoginData({ ...loginData, [e.target.name]: e.target.value });
   };
@@ -69,29 +31,19 @@ const AuthForms = () => {
     setSignupData({ ...signupData, [e.target.name]: e.target.value });
   };
 
-const handleLoginSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    const res = await axios.post("http://localhost:8000/api/login", loginData);
-    console.log("Auth Token:", res.data.token); // ✅ LOG TOKEN HERE
-    localStorage.setItem("token", res.data.token);
-    localStorage.setItem("user", JSON.stringify(res.data.user));
-    setUser(res.data.user);
-    setIsAuthenticated(true);
-    setMessage("Login successful");
-   navigate("/profile");
-  } catch (err) {
-    setMessage(err.response?.data?.message || "Login failed");
-  }
-};
-
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setIsAuthenticated(false);
-    setUser(null);
-    setMessage("Logged out successfully");
+  const handleLoginSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post(
+        "http://localhost:8000/api/login",
+        loginData
+      );
+      login(res.data.user, res.data.token);
+      setMessage("Login successful");
+      navigate("/feed");
+    } catch (err) {
+      setMessage(err.response?.data?.message || "Login failed");
+    }
   };
 
   const handleSignupSubmit = async (e) => {
@@ -112,18 +64,14 @@ const handleLoginSubmit = async (e) => {
         Birthdate: signupData.Birthdate,
       });
 
-      // Auto-login after signup
       const loginRes = await axios.post("http://localhost:8000/api/login", {
         Email: signupData.Email,
         Password: signupData.Password,
       });
 
-      localStorage.setItem("token", loginRes.data.token);
-      localStorage.setItem("user", JSON.stringify(loginRes.data.user));
-      setUser(loginRes.data.user);
-      setIsAuthenticated(true);
-      setMessage("Signup & login successful");
-      setIsLogin(true);
+      login(loginRes.data.user, loginRes.data.token);
+      setMessage("Signup successful");
+      navigate("/feed");
     } catch (err) {
       setMessage(err.response?.data?.message || "Signup failed");
     }
@@ -150,7 +98,9 @@ const handleLoginSubmit = async (e) => {
               onChange={handleLoginChange}
               required
             />
-            <button className="authbutton" type="submit">Log In</button>
+            <button className="authbutton" type="submit">
+              Log In
+            </button>
           </form>
           <p>
             Don't have an account?{" "}
@@ -211,7 +161,9 @@ const handleLoginSubmit = async (e) => {
               onChange={handleSignupChange}
               required
             />
-            <button className="authbutton" type="submit">Sign Up</button>
+            <button className="authbutton" type="submit">
+              Sign Up
+            </button>
           </form>
           <p>
             Already have an account?{" "}
@@ -220,21 +172,9 @@ const handleLoginSubmit = async (e) => {
         </div>
       </div>
 
-      {/* MESSAGE */}
       {message && <p className="message">{message}</p>}
-
-      {/* LOGOUT + USER INFO */}
-      {isAuthenticated && (
-        <div style={{ textAlign: "center", marginTop: "1rem" }}>
-          <p>Welcome, {user?.Name}!</p>
-          <button className="authbutton" onClick={handleLogout} style={{ padding: "10px 20px" }}>
-            Log Out
-          </button>
-        </div>
-      )}
     </section>
   );
 };
 
 export default AuthForms;
-

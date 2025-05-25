@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../CSS/Style.css";
 import { FiX, FiTrash2, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import imageCompression from "browser-image-compression";
 
 const CreateTripPost = () => {
   const [trip, setTrip] = useState({
@@ -17,6 +18,21 @@ const CreateTripPost = () => {
 
   const [isDragging, setIsDragging] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [countries, setCountries] = useState([]);
+
+  useEffect(() => {
+    const fetchCountries = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:8000/api/countries");
+        const data = await response.json();
+        setCountries(data);
+      } catch (err) {
+        console.error("Failed to load countries:", err);
+      }
+    };
+
+    fetchCountries();
+  }, []);
 
   const handleChange = (e) => {
     setTrip({ ...trip, [e.target.name]: e.target.value });
@@ -83,9 +99,35 @@ const CreateTripPost = () => {
       return;
     }
 
+    const errors = [];
+
+    if (!trip.description.trim()) errors.push("Description is required.");
+    if (!trip.destinationCountry.trim())
+      errors.push("Destination country is required.");
+    if (!trip.destinationCity.trim())
+      errors.push("Destination city is required.");
+    if (!trip.departureDate) errors.push("Departure date is required.");
+    if (!trip.returnDate) errors.push("Return date is required.");
+    if (
+      trip.departureDate &&
+      trip.returnDate &&
+      new Date(trip.returnDate) < new Date(trip.departureDate)
+    ) {
+      errors.push("Return date must be after or equal to the departure date.");
+    }
+    if (!trip.travelStyle.trim()) errors.push("Travel style is required.");
+    if (!trip.budget || isNaN(trip.budget))
+      errors.push("Estimated budget is required.");
+    if (!trip.lookingFor.trim()) errors.push("Looking for is required.");
+
+    if (errors.length > 0) {
+      alert("Validation failed:\n" + errors.join("\n"));
+      return;
+    }
+
     const formData = new FormData();
     formData.append("Userid", user.Userid);
-    formData.append("title", "My Trip"); 
+    formData.append("title", "My Trip");
     formData.append("Description", trip.description);
     formData.append("Destination_country", trip.destinationCountry);
     formData.append("Destination_city", trip.destinationCity);
@@ -95,12 +137,24 @@ const CreateTripPost = () => {
     formData.append("Budget_estimated", trip.budget);
     formData.append("Looking_for", trip.lookingFor);
 
-    trip.photos.forEach((photo) => {
-      formData.append("photos[]", photo);
-    });
+    // Compress and append photos
+    try {
+      for (const photo of trip.photos) {
+        const compressed = await imageCompression(photo, {
+          maxSizeMB: 2, // must be under Laravel's 2MB limit
+          maxWidthOrHeight: 1920,
+          useWebWorker: true,
+        });
+        formData.append("photos[]", compressed);
+      }
+    } catch (compressionError) {
+      console.error("Image compression failed:", compressionError);
+      alert("Image compression failed.");
+      return;
+    }
 
     try {
-      const res = await fetch("http://localhost:8000/api/trips", {
+      const res = await fetch("http://127.0.0.1:8000/api/trips", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -108,7 +162,9 @@ const CreateTripPost = () => {
         body: formData,
       });
 
-      const data = await res.json();
+      const contentType = res.headers.get("Content-Type");
+      const isJson = contentType && contentType.includes("application/json");
+      const data = isJson ? await res.json() : await res.text();
 
       if (res.ok) {
         alert("Trip created successfully!");
@@ -124,12 +180,17 @@ const CreateTripPost = () => {
           photos: [],
         });
       } else {
-        console.error("Error:", data);
-        alert("Error posting trip.");
+        console.error("Server error:", data);
+        if (isJson && data.errors) {
+          const errorMessages = Object.values(data.errors).flat();
+          alert("Validation failed:\n" + errorMessages.join("\n"));
+        } else {
+          alert("Trip creation failed. Unexpected server response.");
+        }
       }
     } catch (err) {
       console.error("Submit failed:", err);
-      alert("Something went wrong.");
+      alert("Something went wrong while submitting the trip.");
     }
   };
 
@@ -137,7 +198,11 @@ const CreateTripPost = () => {
     <div className="trip-post">
       {/* Header Section */}
       <div className="header">
-        <img src="/profile-placeholder.jpg" alt="Profile" className="avatar" />
+        <img
+          src="Images/profile-placeholder.jpg"
+          alt="Profile"
+          className="avatar"
+        />
         <div className="description-input">
           <textarea
             placeholder="What's on your mind?"
@@ -204,13 +269,25 @@ const CreateTripPost = () => {
 
       {/* Trip Details */}
       <div className="trip-options">
-        <TripOption
-          icon="🌍"
-          name="destinationCountry"
-          value={trip.destinationCountry}
-          onChange={handleChange}
-          placeholder="Destination Country"
-        />
+        <div className="trip-option">
+          <span className="icon">🌍</span>
+          <label htmlFor="destinationCountry" style={{ display: "none" }}>
+            Destination Country
+          </label>
+          <select
+            name="destinationCountry"
+            value={trip.destinationCountry}
+            onChange={handleChange}
+          >
+            <option value="">Select a country</option>
+            {countries.map((country) => (
+              <option key={country.Countryid} value={country.Name}>
+                {country.Name}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <TripOption
           icon="🏙️"
           name="destinationCity"

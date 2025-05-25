@@ -28,7 +28,6 @@ const NavbarFeed = () => {
       </div>
 
       <div className="navbar-right">
-        <FiCompass className="nav-icon" />
         <FiBell className="nav-icon" />
         <FiUser className="nav-icon" />
         <FiLogOut className="nav-icon" title="Logout" />
