@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import "../CSS/Style.css";
 import { useAuth } from "../contexts/AuthContext";
@@ -10,6 +10,7 @@ const AuthForms = () => {
 
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [loginData, setLoginData] = useState({ Email: "", Password: "" });
 
@@ -39,8 +40,11 @@ const AuthForms = () => {
         loginData
       );
       login(res.data.user, res.data.token);
+      localStorage.setItem("auth_token", res.data.token);
       setMessage("Login successful");
-      navigate("/feed");
+
+      const redirectPath = location.state?.from || "/feed";
+      navigate(redirectPath);
     } catch (err) {
       setMessage(err.response?.data?.message || "Login failed");
     }
@@ -70,8 +74,11 @@ const AuthForms = () => {
       });
 
       login(loginRes.data.user, loginRes.data.token);
+      localStorage.setItem("auth_token", loginRes.data.token);
       setMessage("Signup successful");
-      navigate("/feed");
+
+      const redirectPath = location.state?.from || "/feed";
+      navigate(redirectPath);
     } catch (err) {
       setMessage(err.response?.data?.message || "Signup failed");
     }
@@ -80,7 +87,6 @@ const AuthForms = () => {
   return (
     <section className="auth-section">
       <div className={`form-container ${isLogin ? "" : "signup-mode"}`}>
-        {/* LOGIN FORM */}
         <div className="form-box login-form">
           <h2>Login</h2>
           <form onSubmit={handleLoginSubmit}>
@@ -108,7 +114,6 @@ const AuthForms = () => {
           </p>
         </div>
 
-        {/* SIGNUP FORM */}
         <div className="form-box signup-form">
           <h2>Sign Up</h2>
           <form onSubmit={handleSignupSubmit}>

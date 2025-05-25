@@ -11,7 +11,8 @@ const TripFeed = () => {
 
   const fetchTrips = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("auth_token");
+
       const res = await axios.get("http://localhost:8000/api/trips", {
         headers: {
           Authorization: `Bearer ${token}`,

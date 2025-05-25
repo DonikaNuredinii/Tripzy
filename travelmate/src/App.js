@@ -1,4 +1,3 @@
-// src/App.jsx
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import PrivateRoute from "./Components/PrivateRoute";
@@ -7,7 +6,6 @@ import LandingPage from "./Pages/LandingPage";
 import CreateTripPost from "./Components/CreateTripPost";
 import TripFeedC from "./Pages/Trip-FeedC";
 import MessagesPanel from "./Pages/MessagesPanel";
-import AuthForms from "./Components/AuthForms";
 import ProfilePage from "./Pages/ProfilePage";
 
 function App() {
@@ -15,11 +13,8 @@ function App() {
     <AuthProvider>
       <Router>
         <Routes>
-          {/* Public */}
           <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<AuthForms />} />
 
-          {/* Protected */}
           <Route
             path="/feed"
             element={

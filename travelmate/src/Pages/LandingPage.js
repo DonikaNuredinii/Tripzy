@@ -2,40 +2,37 @@ import React from "react";
 import { ParallaxProvider, Parallax } from "react-scroll-parallax";
 import "../CSS/Style.css";
 import NavBar from "../Components/Navbar";
-import AuthForms from '../Components/AuthForms';
-
-
+import AuthForms from "../Components/AuthForms";
 
 const LandingPage = () => {
   return (
     <ParallaxProvider>
       <section className="video-section">
         <NavBar></NavBar>
-        <ParallaxProvider>
-          <section className="video-section">
-            <Parallax speed={-20}>
-              <div className="video-wrapper">
-                <video
-                  className="background-video"
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                >
-                  <source
-                    src="/Images/9907159-uhd_4096_2160_25fps.mp4"
-                    type="video/mp4"
-                  />
-                </video>
-              </div>
-            </Parallax>
 
-            <div className="overlay-content">
-              <h1>Find a Travel Mate</h1>
-              <p>Travel the world together.</p>
+        <section className="video-section">
+          <Parallax speed={-20}>
+            <div className="video-wrapper">
+              <video
+                className="background-video"
+                autoPlay
+                muted
+                loop
+                playsInline
+              >
+                <source
+                  src="/Images/9907159-uhd_4096_2160_25fps.mp4"
+                  type="video/mp4"
+                />
+              </video>
             </div>
-          </section>
-        </ParallaxProvider>
+          </Parallax>
+
+          <div className="overlay-content">
+            <h1>Find a Travel Mate</h1>
+            <p>Travel the world together.</p>
+          </div>
+        </section>
 
         <div className="curve-divider">
           <svg viewBox="0 0 1440 320" preserveAspectRatio="none">
