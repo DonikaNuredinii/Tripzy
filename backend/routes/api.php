@@ -27,6 +27,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/trips/{tripId}/likes', [TripLikeController::class, 'destroy']);
     Route::get('/trips/{tripId}/comments', [TripCommentController::class, 'index']);
     Route::post('/trips/{tripId}/comments', [TripCommentController::class, 'store']);
+    Route::get('/my-match-requests', [TripMatchController::class, 'myPendingMatches']);
+
 });
 
 Route::get('/trips/{trip}', [TripController::class, 'show']);

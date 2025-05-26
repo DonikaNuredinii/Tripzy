@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use App\Models\TripMatch;    
 
 class TripController extends Controller
 {
@@ -19,6 +20,17 @@ public function index()
         ->get();
 }
 
+public function myMatchRequests(Request $request)
+{
+    $userId = auth()->id();
+
+    return TripMatch::with(['trip', 'user'])
+        ->whereHas('trip', function ($query) use ($userId) {
+            $query->where('Userid', $userId); 
+        })
+        ->orderByDesc('created_at')
+        ->get(); 
+}
 
 
     // POST /api/trips
@@ -112,4 +124,5 @@ public function index()
 
         return response()->json(['message' => 'Trip deleted successfully.']);
     }
+    
 }

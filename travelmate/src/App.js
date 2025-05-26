@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import PrivateRoute from "./Components/PrivateRoute";
-
 import LandingPage from "./Pages/LandingPage";
 import CreateTripPost from "./Components/CreateTripPost";
 import TripFeedC from "./Pages/Trip-FeedC";

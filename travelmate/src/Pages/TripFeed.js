@@ -3,6 +3,7 @@ import axios from "axios";
 import "../CSS/Style.css";
 import CreateTripPost from "../Components/CreateTripPost";
 import TripComments from "../Components/TripComments";
+import MatchRequests from "../Components/MatchRequests ";
 
 const TripFeed = () => {
   const [trips, setTrips] = useState([]);
@@ -84,6 +85,34 @@ const TripFeed = () => {
   };
 
   const currentUserName = localStorage.getItem("user_name");
+  /*Add HandleMatch*/
+  const handleMatch = async (tripId) => {
+    const token = localStorage.getItem("auth_token");
+    const userId = localStorage.getItem("user_id");
+
+    if (!userId) {
+      alert("User ID missing from localStorage.");
+      return;
+    }
+
+    try {
+      const data = {
+        Tripid: tripId,
+        Userid: userId,
+        Status: "pending",
+      };
+
+      await axios.post("http://localhost:8000/api/trip-matches", data, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      alert("Match request sent!");
+    } catch (err) {
+      console.error("Error sending match request:", err);
+      alert("Failed to match. You may have already matched.");
+    }
+  };
+
   return (
     <div className="trip-feed">
       <div className="trip-feed-header">
@@ -196,7 +225,9 @@ const TripFeed = () => {
                     {activeCommentTripId === trip.Tripid ? "Hide" : "Comment"}
                   </button>
 
-                  <button>💞 Match</button>
+                  <button onClick={() => handleMatch(trip.Tripid)}>
+                    💞 Match
+                  </button>
                 </div>
               </div>
 

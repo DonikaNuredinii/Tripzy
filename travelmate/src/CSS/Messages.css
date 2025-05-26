@@ -160,3 +160,86 @@
     height: 70%;
   }
 }
+/*==================Matches style==============*/
+.match-requests-wrapper {
+  padding: 0.3rem;
+}
+
+.match-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.match-request {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  padding: 10px 0;
+  margin-top: 30px;
+}
+
+.match-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 10px;
+  margin-top: -45px;
+}
+
+.match-info {
+  flex: 1;
+  max-width: 180px;
+}
+
+.match-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: -35px;
+}
+
+.match-actions button {
+  background-color: #140c06;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.match-actions .deny {
+  background-color: #f44336;
+  color: white;
+}
+
+.accepted-list .match-actions {
+  justify-content: flex-end;
+}
+.match-request.accepted {
+  background-color: #f0fdf4;
+}
+
+.match-request.rejected {
+  background-color: #fdf2f2;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.deny {
+  color: red;
+}
+
+.accepted {
+  color: green;
+}
+
+.denied-label {
+  font-size: 0.85rem;
+  color: #999;
+}

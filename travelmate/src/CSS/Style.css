@@ -790,6 +790,34 @@ select {
   right: 12px;
 }
 /*=====================Travel Feed==================*/
+.sidebar-match {
+  padding: 15px;
+  border-left: 1px solid #ddd;
+  background-color: #f9f9f9;
+  width: 400px;
+}
+.feed-page-container {
+  display: flex;
+  position: relative;
+}
+
+.main-feed-content {
+  flex: 1;
+  padding: 20px;
+}
+
+.sidebar {
+  width: 300px;
+  padding: 15px;
+  border-left: 1px solid #ddd;
+  background-color: #f9f9f9;
+  height: 100vh;
+  overflow-y: auto;
+  position: sticky;
+  top: 70px; /* adjust if navbar height is different */
+  z-index: 999;
+}
+
 .trip-feed-header {
   display: flex;
   justify-content: flex-end;
