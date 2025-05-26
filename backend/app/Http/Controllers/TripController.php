@@ -5,16 +5,23 @@ namespace App\Http\Controllers;
 use App\Models\Trip;
 use App\Models\TripPhoto;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 
 class TripController extends Controller
 {
-    public function index()
-    {
-        return Trip::with(['user', 'comments', 'photos', 'matches', 'country'])->get();
-    }
+    // GET /api/trips
+public function index()
+{
+    return Trip::with(['user', 'photos', 'matches', 'country', 'likes.user'])
+        ->withCount(['likes', 'comments'])
+        ->get();
+}
 
+
+
+    // POST /api/trips
     public function store(Request $request)
     {
         Log::info('🚀 Incoming trip request', $request->all());
@@ -57,11 +64,15 @@ class TripController extends Controller
         ], 201);
     }
 
+    // GET /api/trips/{id}
     public function show($id)
     {
-        return Trip::with(['user', 'comments', 'photos', 'matches', 'country'])->findOrFail($id);
+        return Trip::with(['user', 'comments', 'photos', 'matches', 'country'])
+            ->withCount(['likes', 'comments'])
+            ->findOrFail($id);
     }
 
+    // PUT /api/trips/{id}
     public function update(Request $request, $id)
     {
         $trip = Trip::findOrFail($id);
@@ -86,10 +97,12 @@ class TripController extends Controller
         ]);
     }
 
+    // DELETE /api/trips/{id}
     public function destroy($id)
     {
         $trip = Trip::findOrFail($id);
 
+        // Delete photos from storage and DB
         foreach ($trip->photos as $photo) {
             Storage::disk('public')->delete($photo->image_path);
             $photo->delete();

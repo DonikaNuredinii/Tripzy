@@ -18,7 +18,8 @@ return new class extends Migration
             $table->increments('trip_matchesid');
 
             // Lidhje me tabelën trips
-            $table->unsignedInteger('Tripid');
+       $table->unsignedBigInteger('Tripid');
+
             $table->foreign('Tripid')->references('Tripid')->on('trips')->onDelete('cascade');
 
             // Lidhje me tabelën users, por pa cascade për të shmangur "multiple cascade paths"

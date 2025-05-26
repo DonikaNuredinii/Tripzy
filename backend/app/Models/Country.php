@@ -11,7 +11,6 @@ class Country extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'Tripid',
         'Name',
         'Image_path',
     ];

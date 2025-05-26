@@ -16,7 +16,8 @@ return new class extends Migration
     {
         Schema::create('trip_photos', function (Blueprint $table) {
             $table->increments('Tripphotosid');
-            $table->unsignedInteger('Tripid');
+            $table->unsignedBigInteger('Tripid');
+
             $table->string('image_path');
             $table->string('caption')->nullable();
             $table->dateTime('created_at')->default(DB::raw('GETDATE()'));

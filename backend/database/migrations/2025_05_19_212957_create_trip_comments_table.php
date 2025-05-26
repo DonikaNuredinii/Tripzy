@@ -16,7 +16,8 @@ return new class extends Migration
     {
         Schema::create('trip_comments', function (Blueprint $table) {
             $table->increments('Tripcommentsid');
-            $table->unsignedInteger('Tripid');
+            $table->unsignedBigInteger('Tripid');
+
             $table->unsignedBigInteger('Userid');
             $table->text('Comment');
             $table->dateTime('Created_at')->default(DB::raw('GETDATE()'));

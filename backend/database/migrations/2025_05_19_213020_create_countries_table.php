@@ -15,7 +15,8 @@ return new class extends Migration
     {
         Schema::create('countries', function (Blueprint $table) {
             $table->increments('Countryid');
-            $table->unsignedInteger('Tripid');
+           $table->unsignedBigInteger('Tripid');
+
             $table->string('Name');
             $table->string('Image_path')->nullable();
 

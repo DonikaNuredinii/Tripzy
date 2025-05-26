@@ -29,7 +29,9 @@ const NavbarFeed = () => {
 
       <div className="navbar-right">
         <FiBell className="nav-icon" />
-        <FiUser className="nav-icon" />
+        <NavLink to="/profile">
+          <FiUser className="nav-icon" />
+        </NavLink>
         <FiLogOut className="nav-icon" title="Logout" />
       </div>
     </nav>

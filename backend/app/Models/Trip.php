@@ -25,6 +25,8 @@ class Trip extends Model
         'Looking_for',
     ];
 
+    protected $appends = ['liked_by_user'];
+
     // Relationships
     public function user()
     {
@@ -49,5 +51,26 @@ class Trip extends Model
     public function country()
     {
         return $this->belongsTo(Country::class, 'Destination_country', 'name');
+    }
+
+    public function likes()
+    {
+        return $this->hasMany(TripLike::class, 'Tripid');
+    }
+
+    // Auto-included in JSON
+    public function getLikedByUserAttribute()
+    {
+        if (!auth()->check()) {
+            return false;
+        }
+
+        return $this->likes()->where('Userid', auth()->id())->exists();
+    }
+
+    // Manual check if needed elsewhere
+    public function isLikedBy($userId)
+    {
+        return $this->likes()->where('Userid', $userId)->exists();
     }
 }

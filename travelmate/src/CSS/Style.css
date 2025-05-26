@@ -876,6 +876,10 @@ select {
   color: #666;
   margin-bottom: 0.5rem;
 }
+button.liked {
+  color: #2e89ff;
+  font-weight: bold;
+}
 
 .action-buttons {
   display: flex;
@@ -1189,4 +1193,103 @@ select {
   font-size: 0.8rem;
   border-radius: 6px;
   border: none;
+}
+/*===============Comments==================*/
+.comments-wrapper {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 12px;
+  background: #f9f9f9;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.no-comments {
+  font-style: italic;
+  color: #666;
+  padding: 0.5rem 0;
+}
+
+.comment-card {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.comment-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+.comment-body {
+  flex: 1;
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 2px;
+}
+
+.comment-time {
+  font-weight: 400;
+  color: #999;
+  font-size: 0.8rem;
+}
+
+.comment-text {
+  font-size: 0.95rem;
+  color: #222;
+  margin: 4px 0;
+}
+
+.comment-footer {
+  margin-top: 4px;
+  display: flex;
+  gap: 16px;
+}
+
+.comment-action {
+  background: none;
+  border: none;
+  color: #0a66c2;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0;
+}
+
+.comment-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 1rem;
+  border-top: 1px solid #ddd;
+  padding-top: 1rem;
+}
+
+.comment-input-wrapper input {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  font-size: 0.9rem;
+}
+
+.comment-send-btn {
+  background-color: #0a66c2;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.2s ease;
+}
+
+.comment-send-btn:hover {
+  background-color: #004182;
 }
