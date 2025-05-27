@@ -30,17 +30,19 @@ const UserPage = () => {
     setIsEditMode(true);
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this user?")) {
-      try {
-        await axios.delete(`http://localhost:8000/api/users/${id}`);
-        fetchUsers();
-      } catch (err) {
-        console.error("Error deleting user:", err);
-        alert("Error deleting user.");
-      }
+ const handleDelete = async (id) => {
+  const cleanId = parseInt(id); 
+  if (window.confirm("Are you sure you want to delete this user?")) {
+    try {
+      await axios.delete(`http://localhost:8000/api/users/${cleanId}`);
+      fetchUsers();
+    } catch (err) {
+      console.error("Error deleting user:", err);
+      alert("Error deleting user.");
     }
-  };
+  }
+};
+
 
   const handleAdd = () => {
     setModalUser({
@@ -51,7 +53,7 @@ const UserPage = () => {
       Birthdate: "",
       Country: "",
       Profile_photo: "",
-      Roleid: 2, // default to "user"
+      Roleid: 2, 
     });
     setIsEditMode(false);
   };
@@ -107,7 +109,7 @@ const UserPage = () => {
               <td>{u.role?.Name}</td>
               <td>
                 <button onClick={() => handleEdit(u)} className="icon-btn"><FaEdit /></button>
-                <button onClick={() => handleDelete(u.Userid)} className="icon-btn"><FaTrash /></button>
+                <button onClick={() => handleDelete(parseInt(u.Userid))} className="icon-btn"><FaTrash /></button>
               </td>
             </tr>
           ))}
