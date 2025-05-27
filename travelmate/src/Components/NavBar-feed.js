@@ -18,8 +18,10 @@ const NavbarFeed = ({ onBellClick }) => {
   return (
     <nav className="navbar-feed">
       <div className="navbar-left">
-        <MdOutlineModeOfTravel />
-        <h1>TRIPZY</h1>
+        <NavLink to="/" className="logo-link">
+          <MdOutlineModeOfTravel />
+          <h1>TRIPZY</h1>
+        </NavLink>
       </div>
 
       <div className="navbar-center">

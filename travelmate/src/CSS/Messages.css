@@ -174,9 +174,9 @@
 .match-request {
   display: flex;
   align-items: center;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #dddddd;
   padding: 10px 0;
-  margin-top: 30px;
+  margin-top: 70px;
 }
 
 .match-avatar {
@@ -196,14 +196,14 @@
 .match-actions {
   display: flex;
   gap: 0.5rem;
-  margin-top: -35px;
+  margin-top: -50px;
 }
 
 .match-actions button {
   background-color: #140c06;
   color: white;
   border: none;
-  padding: 0.6rem 1.2rem;
+  padding: 0.5rem 1.1rem;
   font-size: 0.95rem;
   cursor: pointer;
   transition: background-color 0.2s ease;
@@ -212,17 +212,18 @@
 .match-actions .deny {
   background-color: #f44336;
   color: white;
+  padding: 0.5rem 1.2rem;
+}
+.icon-btn.accepted {
+  background: none;
+  border: none;
+  margin-left: 100px;
+  cursor: pointer;
+  color: #140c06;
 }
 
 .accepted-list .match-actions {
   justify-content: flex-end;
-}
-.match-request.accepted {
-  background-color: #f0fdf4;
-}
-
-.match-request.rejected {
-  background-color: #fdf2f2;
 }
 
 .icon-btn {
@@ -233,10 +234,6 @@
 
 .deny {
   color: red;
-}
-
-.accepted {
-  color: green;
 }
 
 .denied-label {

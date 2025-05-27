@@ -18,6 +18,7 @@ const MatchRequests = () => {
         }
       );
       setRequests(res.data);
+      console.log("Fetched match requests:", res.data);
     } catch (err) {
       console.error("Failed to fetch match requests", err);
     }
@@ -49,63 +50,67 @@ const MatchRequests = () => {
         <p>No match activity yet.</p>
       ) : (
         <ul className="match-list">
-          {requests.map((req) => {
-            const { trip_matchesid, Status, user, trip, created_at } = req;
+          {requests
+            .filter((req) => req.Status !== "rejected")
+            .map((req) => {
+              const { trip_matchesid, Status, user, trip, created_at } = req;
 
-            const profileImage =
-              user?.profile_picture || "/Images/profile-placeholder.jpg";
-            const tripCity = trip?.Destination_city || "your destination";
+              const profileImage =
+                user?.profile_picture || "/Images/profile-placeholder.jpg";
+              const tripCity = trip?.Destination_city || "your destination";
 
-            return (
-              <li key={trip_matchesid} className={`match-request ${Status}`}>
-                <img
-                  src={profileImage}
-                  alt={user?.Name}
-                  className="match-avatar"
-                />
+              return (
+                <li key={trip_matchesid} className={`match-request ${Status}`}>
+                  <img
+                    src={profileImage}
+                    alt={user?.Name}
+                    className="match-avatar"
+                  />
 
-                <div className="match-info">
-                  <strong>{user?.Name}</strong> requested to match your trip to{" "}
-                  <strong>{tripCity}</strong>
-                  <p className="match-time">
-                    {new Date(created_at).toLocaleDateString()}
-                  </p>
-                </div>
+                  <div className="match-info">
+                    <strong>{user?.Name}</strong> requested to match your trip
+                    to <strong>{tripCity}</strong>
+                    <p className="match-time">
+                      {new Date(created_at).toLocaleDateString()}
+                    </p>
+                  </div>
 
-                <div className="match-actions">
-                  {Status === "pending" ? (
-                    <>
+                  <div className="match-actions">
+                    {Status === "pending" && (
+                      <>
+                        <button
+                          onClick={() =>
+                            handleResponse(trip_matchesid, "accepted")
+                          }
+                        >
+                          Accept
+                        </button>
+                        <button
+                          onClick={() =>
+                            handleResponse(trip_matchesid, "rejected")
+                          }
+                          className="deny"
+                        >
+                          Deny
+                        </button>
+                      </>
+                    )}
+
+                    {Status === "accepted" && (
                       <button
+                        title="Go to messages"
+                        className="icon-btn accepted"
                         onClick={() =>
-                          handleResponse(trip_matchesid, "accepted")
+                          navigate(`/messages?user=${user?.Userid}`)
                         }
                       >
-                        Accept
+                        <FiMail size={30} />
                       </button>
-                      <button
-                        onClick={() =>
-                          handleResponse(trip_matchesid, "rejected")
-                        }
-                        className="deny"
-                      >
-                        Deny
-                      </button>
-                    </>
-                  ) : Status === "accepted" ? (
-                    <button
-                      title="Go to messages"
-                      className="icon-btn accepted"
-                      onClick={() => navigate(`/messages?user=${user?.Userid}`)}
-                    >
-                      <FiMail size={20} />
-                    </button>
-                  ) : (
-                    <span className="denied-label">Denied ❌</span>
-                  )}
-                </div>
-              </li>
-            );
-          })}
+                    )}
+                  </div>
+                </li>
+              );
+            })}
         </ul>
       )}
     </div>

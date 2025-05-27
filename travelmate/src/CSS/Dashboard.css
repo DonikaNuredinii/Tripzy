@@ -1,6 +1,6 @@
 .sidebar {
   width: 250px;
-  background-color: #A68D7F;
+  background-color: #a68d7f;
   color: #fff;
   padding: 20px;
   height: 100vh;
@@ -15,7 +15,7 @@
   text-align: center;
   margin-bottom: 40px;
   letter-spacing: 1px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   position: relative;
 }
 
@@ -87,7 +87,7 @@
 }
 
 .user-table th {
-  background-color: #A38774;
+  background-color: #a38774;
   color: white;
 }
 
@@ -130,13 +130,12 @@
   margin-bottom: 12px;
 }
 
-.grid-form+.form-group {
+.grid-form + .form-group {
   margin-top: 12px;
 }
 
-
 .btn-light {
-  background-color: #A38774;
+  background-color: #a38774;
   color: white;
   border: none;
   padding: 8px 14px;
@@ -146,7 +145,7 @@
 }
 
 .btn-dark {
-  background-color: #A38774;
+  background-color: #a38774;
   color: white;
   border: none;
   padding: 8px 14px;
@@ -192,7 +191,6 @@
   margin-bottom: 3px;
 }
 
-
 .form-row .form-group {
   flex: 1;
 }
@@ -205,23 +203,13 @@
   text-align: center;
   font-size: 14px;
   border-radius: 6px;
-  background-color: #A38774;
+  background-color: #a38774;
   color: white;
   border: none;
   cursor: pointer;
 }
 
-
 /*==================CountryForm==============================*/
-.form-container {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 500px;
-  margin: auto;
-}
 
 .country-form label {
   display: block;
@@ -264,13 +252,13 @@
 .user-form select:focus,
 .user-form input:focus {
   outline: none;
-  border-color: #A38774;
+  border-color: #a38774;
   box-shadow: 0 0 5px rgba(163, 135, 116, 0.4);
 }
 
 .modal-box h3 {
   font-size: 22px;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: "Segoe UI", sans-serif;
   margin-bottom: 10px;
 }
 

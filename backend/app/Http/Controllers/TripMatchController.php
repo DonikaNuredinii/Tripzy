@@ -33,7 +33,7 @@ class TripMatchController extends Controller
 
     return $match->load('trip', 'user');
 }
-public function myPendingMatches(Request $request)
+public function myMatchRequests(Request $request)
 {
     $userId = auth()->id();
 
@@ -41,9 +41,10 @@ public function myPendingMatches(Request $request)
         ->whereHas('trip', function ($query) use ($userId) {
             $query->where('Userid', $userId);
         })
-        ->where('Status', 'pending')
+        ->orderByDesc('created_at')
         ->get();
 }
+
 
     public function show($id)
     {
