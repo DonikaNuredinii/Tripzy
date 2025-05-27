@@ -48,10 +48,11 @@ class Trip extends Model
         return $this->hasMany(TripMatch::class, 'Tripid', 'Tripid');
     }
 
-    public function country()
+   public function country()
     {
-        return $this->belongsTo(Country::class, 'Destination_country', 'name');
+        return $this->belongsTo(Country::class, 'Countryid', 'Countryid');
     }
+
 
     public function likes()
     {

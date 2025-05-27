@@ -15,13 +15,13 @@ class CountryController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'Tripid' => 'required|exists:trips,Tripid',
             'Name' => 'required|string',
             'Image_path' => 'nullable|string',
         ]);
 
         return Country::create($data);
     }
+
 
     public function show($id)
     {

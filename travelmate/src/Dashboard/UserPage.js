@@ -10,7 +10,8 @@ const UserPage = () => {
   const [isEditMode, setIsEditMode] = useState(false);
 
   useEffect(() => {
-    axios.defaults.headers.common["Authorization"] = `Bearer ${localStorage.getItem("auth_token")}`;
+    axios.defaults.headers.common["Authorization"] =
+      `Bearer ${localStorage.getItem("auth_token")}`;
     fetchUsers();
     fetchRoles();
   }, []);
@@ -30,19 +31,18 @@ const UserPage = () => {
     setIsEditMode(true);
   };
 
- const handleDelete = async (id) => {
-  const cleanId = parseInt(id); 
-  if (window.confirm("Are you sure you want to delete this user?")) {
-    try {
-      await axios.delete(`http://localhost:8000/api/users/${cleanId}`);
-      fetchUsers();
-    } catch (err) {
-      console.error("Error deleting user:", err);
-      alert("Error deleting user.");
+  const handleDelete = async (id) => {
+    const cleanId = parseInt(id);
+    if (window.confirm("Are you sure you want to delete this user?")) {
+      try {
+        await axios.delete(`http://localhost:8000/api/users/${cleanId}`);
+        fetchUsers();
+      } catch (err) {
+        console.error("Error deleting user:", err);
+        alert("Error deleting user.");
+      }
     }
-  }
-};
-
+  };
 
   const handleAdd = () => {
     setModalUser({
@@ -53,7 +53,7 @@ const UserPage = () => {
       Birthdate: "",
       Country: "",
       Profile_photo: "",
-      Roleid: 2, 
+      Roleid: 2,
     });
     setIsEditMode(false);
   };
@@ -62,7 +62,10 @@ const UserPage = () => {
     e.preventDefault();
     try {
       if (isEditMode) {
-        await axios.put(`http://localhost:8000/api/users/${modalUser.Userid}`, modalUser);
+        await axios.put(
+          `http://localhost:8000/api/users/${modalUser.Userid}`,
+          modalUser
+        );
       } else {
         await axios.post("http://localhost:8000/api/users", modalUser);
       }
@@ -81,7 +84,9 @@ const UserPage = () => {
 
   return (
     <div className="user-page">
-      <button className="btn-dark" onClick={handleAdd}>+ Add User</button>
+      <button className="btn-dark" onClick={handleAdd}>
+        + Add User
+      </button>
       <table className="user-table">
         <thead>
           <tr>
@@ -108,8 +113,15 @@ const UserPage = () => {
               <td>{u.Country}</td>
               <td>{u.role?.Name}</td>
               <td>
-                <button onClick={() => handleEdit(u)} className="icon-btn"><FaEdit /></button>
-                <button onClick={() => handleDelete(parseInt(u.Userid))} className="icon-btn"><FaTrash /></button>
+                <button onClick={() => handleEdit(u)} className="icon-btn">
+                  <FaEdit />
+                </button>
+                <button
+                  onClick={() => handleDelete(parseInt(u.Userid))}
+                  className="icon-btn"
+                >
+                  <FaTrash />
+                </button>
               </td>
             </tr>
           ))}
@@ -131,46 +143,90 @@ const UserPage = () => {
               <div className="form-row">
                 <div className="form-group">
                   <label>First Name</label>
-                  <input name="Name" value={modalUser.Name} onChange={handleChange} required />
+                  <input
+                    name="Name"
+                    value={modalUser.Name}
+                    onChange={handleChange}
+                    required
+                  />
                 </div>
                 <div className="form-group">
                   <label>Last Name</label>
-                  <input name="Lastname" value={modalUser.Lastname} onChange={handleChange} required />
+                  <input
+                    name="Lastname"
+                    value={modalUser.Lastname}
+                    onChange={handleChange}
+                    required
+                  />
                 </div>
               </div>
 
               <div className="form-group">
                 <label>Email</label>
-                <input name="Email" type="email" value={modalUser.Email} onChange={handleChange} required />
+                <input
+                  name="Email"
+                  type="email"
+                  value={modalUser.Email}
+                  onChange={handleChange}
+                  required
+                />
               </div>
 
               <div className="form-group">
                 <label>Password</label>
-                <input name="Password" type="password" value={modalUser.Password} onChange={handleChange} />
+                <input
+                  name="Password"
+                  type="password"
+                  value={modalUser.Password}
+                  onChange={handleChange}
+                />
               </div>
 
               <div className="form-group">
                 <label>Birthdate</label>
-                <input name="Birthdate" type="date" value={modalUser.Birthdate || ""} onChange={handleChange} />
+                <input
+                  name="Birthdate"
+                  type="date"
+                  value={modalUser.Birthdate || ""}
+                  onChange={handleChange}
+                />
               </div>
 
               <div className="form-group">
                 <label>Country</label>
-                <input name="Country" value={modalUser.Country || ""} onChange={handleChange} />
+                <input
+                  name="Country"
+                  value={modalUser.Country || ""}
+                  onChange={handleChange}
+                />
               </div>
 
               <div className="form-group">
                 <label>Role</label>
-                <select name="Roleid" value={modalUser.Roleid} onChange={handleChange}>
+                <select
+                  name="Roleid"
+                  value={modalUser.Roleid}
+                  onChange={handleChange}
+                >
                   {roles.map((r) => (
-                    <option key={r.Roleid} value={r.Roleid}>{r.Name}</option>
+                    <option key={r.Roleid} value={r.Roleid}>
+                      {r.Name}
+                    </option>
                   ))}
                 </select>
               </div>
 
               <div className="modal-buttons">
-                <button type="button" className="btn-light" onClick={() => setModalUser(null)}>Close</button>
-                <button type="submit" className="btn-dark">Save Changes</button>
+                <button
+                  type="button"
+                  className="btn-light"
+                  onClick={() => setModalUser(null)}
+                >
+                  Close
+                </button>
+                <button type="submit" className="btn-dark">
+                  Save Changes
+                </button>
               </div>
             </form>
           </div>
