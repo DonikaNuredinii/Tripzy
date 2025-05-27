@@ -7,6 +7,13 @@ import TripFeedC from "./Pages/Trip-FeedC";
 import MessagesPanel from "./Pages/MessagesPanel";
 import ProfilePage from "./Pages/ProfilePage";
 
+
+import UserPage from "./Dashboard/UserPage";
+import TripsPage from "./Dashboard/TripsPage";
+import Statistics from "./Dashboard/Statistics";
+import CountryForm  from "./Dashboard/CountryForm";
+import DashboardWrapper from "./Dashboard/DashboardWrapper";
+
 function App() {
   return (
     <AuthProvider>
@@ -46,6 +53,14 @@ function App() {
               </PrivateRoute>
             }
           />
+
+          
+        <Route path="/dashboard" element={<DashboardWrapper />}>
+          <Route path="users" element={<UserPage />} />
+          <Route path="trips" element={<TripsPage />} />
+          <Route path="country" element={<CountryForm />} />
+          <Route path="statistics" element={<Statistics />} />
+        </Route>
         </Routes>
       </Router>
     </AuthProvider>

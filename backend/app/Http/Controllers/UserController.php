@@ -77,11 +77,18 @@ public function update(Request $request, $id)
 
 
 
-    public function destroy($id)
-    {
-        $user = User::findOrFail($id);
-        $user->delete();
+  public function destroy($id)
+{
+    $user = User::find($id);
 
-        return response()->json(['message' => 'User deleted']);
+    if (!$user) {
+        return response()->json(['error' => 'User not found'], 404);
     }
+
+    // Kontrollo nëse ka relacione që duhet fshirë para
+    $user->delete();
+
+    return response()->json(['message' => 'User deleted']);
+}
+
 }
