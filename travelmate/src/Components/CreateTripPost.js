@@ -281,7 +281,7 @@ const CreateTripPost = () => {
           >
             <option value="">Select a country</option>
             {countries.map((country) => (
-              <option key={country.Countryid} value={country.Name}>
+              <option key={country.Countryid} value={country.Countryid}>
                 {country.Name}
               </option>
             ))}

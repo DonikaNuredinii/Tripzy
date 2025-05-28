@@ -50,7 +50,7 @@ class Trip extends Model
 
    public function country()
     {
-        return $this->belongsTo(Country::class, 'Countryid', 'Countryid');
+          return $this->belongsTo(Country::class, 'Destination_country', 'Countryid');
     }
 
 

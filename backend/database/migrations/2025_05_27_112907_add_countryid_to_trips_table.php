@@ -5,13 +5,16 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
-    public function up()
-    {
-        Schema::table('trips', function (Blueprint $table) {
-            $table->unsignedInteger('Countryid')->nullable()->after('Userid');
-            $table->foreign('Countryid')->references('Countryid')->on('countries')->onDelete('set null');
-        });
-    }
+  public function up()
+{
+    Schema::table('trips', function (Blueprint $table) {
+        if (!Schema::hasColumn('trips', 'Destination_country')) {
+            $table->unsignedBigInteger('Destination_country')->nullable();
+            $table->foreign('Destination_country')->references('Countryid')->on('countries')->onDelete('set null');
+        }
+    });
+}
+
 
     public function down()
     {

@@ -12,6 +12,7 @@ class TripMatch extends Model
     protected $fillable = [
         'Tripid',
         'Userid',
+        'sender_id', 
         'Status',
     ];
 
@@ -24,4 +25,9 @@ class TripMatch extends Model
     {
         return $this->belongsTo(User::class, 'Userid');
     }
+    public function sender()
+{
+    return $this->belongsTo(User::class, 'sender_id');
+}
+
 }

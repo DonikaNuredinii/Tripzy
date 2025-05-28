@@ -12,12 +12,17 @@ use Illuminate\Support\Facades\Storage;
 class TripController extends Controller
 {
     // GET /api/trips
-    public function index()
-    {
-        return Trip::with(['user', 'photos', 'matches', 'country', 'likes.user'])
-            ->withCount(['likes', 'comments'])
-            ->get();
-    }
+  public function index()
+{
+    return Trip::with(['user', 'photos', 'matches.sender', 'country', 'likes.user'])
+        ->withCount(['likes', 'comments'])
+        ->get();
+}
+
+public function matches()
+{
+    return $this->hasMany(TripMatch::class, 'Tripid')->with('sender');
+}
 
     // GET /api/trips/match-requests
     public function myMatchRequests(Request $request)
@@ -42,7 +47,7 @@ class TripController extends Controller
                 'Userid'            => 'required|exists:users,Userid',
                 'title'             => 'required|string|max:255',
                 'Description'       => 'required|string',
-                'Countryid'         => 'required|exists:countries,Countryid',
+                'Destination_country' => 'required|exists:countries,Countryid',
                 'Destination_city'  => 'required|string|max:100',
                 'Departuredate'     => 'required|date',
                 'Return_date'       => 'required|date|after_or_equal:Departuredate',
@@ -60,7 +65,7 @@ class TripController extends Controller
             'Userid'            => $data['Userid'],
             'title'             => $data['title'],
             'Description'       => $data['Description'],
-            'Countryid'         => $data['Countryid'],
+            'Destination_country' => $data['Destination_country'],
             'Destination_city'  => $data['Destination_city'],
             'Departuredate'     => $data['Departuredate'],
             'Return_date'       => $data['Return_date'],

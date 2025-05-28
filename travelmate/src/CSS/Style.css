@@ -910,6 +910,12 @@ button.liked {
   color: #2e89ff;
   font-weight: bold;
 }
+.match-sent {
+  background-color: #ffe6ec;
+  border: 1px solid #ff5c8d;
+  color: #d1004d;
+  font-weight: bold;
+}
 
 .action-buttons {
   display: flex;
@@ -1260,8 +1266,6 @@ button.liked {
 .upload-btn:hover {
   background-color: #222;
 }
-
-
 
 /*===============Comments==================*/
 .comments-wrapper {

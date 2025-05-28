@@ -176,6 +176,8 @@
   align-items: center;
   border-bottom: 1px solid #dddddd;
   padding: 10px 0;
+  position: relative;
+  z-index: 1;
   margin-top: 70px;
 }
 
@@ -197,6 +199,8 @@
   display: flex;
   gap: 0.5rem;
   margin-top: -50px;
+  position: relative;
+  z-index: 2;
 }
 
 .match-actions button {
