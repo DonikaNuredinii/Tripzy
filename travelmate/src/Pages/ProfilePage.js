@@ -6,19 +6,23 @@ const ProfilePage = () => {
   const [user, setUser] = useState(null);
   const [message, setMessage] = useState("");
   const [newPassword, setNewPassword] = useState("");
-const [confirmPassword, setConfirmPassword] = useState("");
+  const [profilePhoto, setProfilePhoto] = useState(null);
 
-const handleChange = (e) => {
-  setUser({ ...user, [e.target.name]: e.target.value });
-};
+  const [confirmPassword, setConfirmPassword] = useState("");
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setUser((prevUser) => ({ ...prevUser, [name]: value }));
+  };
+
+  
 
 
   const fetchUser = async () => {
     try {
       const res = await axios.get("http://localhost:8000/api/me", {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
         },
       });
       setUser(res.data);
@@ -33,37 +37,79 @@ const handleChange = (e) => {
     return;
   }
 
-  const updatedData = {
-    ...user,
-  };
+  const formData = new FormData();
+
+  Object.entries(user).forEach(([key, value]) => {
+    if (value !== null && value !== undefined) {
+      formData.append(key, value);
+    }
+  });
 
   if (newPassword.trim() !== "") {
-    updatedData.Password = newPassword;
+    formData.append("Password", newPassword);
   }
 
+  // ✅ Only append if a new photo was selected
+  if (profilePhoto) {
+    formData.append("Profile_photo", profilePhoto);
+  }
+
+  // ✅ Handle boolean explicitly (Laravel doesn't like strings for booleans)
+  formData.append("Verified", user.Verified ? 1 : 0);
+
+  console.log("Uploading:", profilePhoto);
+
   try {
-    await axios.put(`http://localhost:8000/api/users/${user.Userid}`, updatedData, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
+    await axios.post(
+      `http://localhost:8000/api/users/${user.Userid}?_method=PUT`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
 
     setMessage("Profile updated successfully.");
     setNewPassword("");
     setConfirmPassword("");
+    setProfilePhoto(null);
+    fetchUser();
   } catch (err) {
-    console.error("Update failed", err);
-    setMessage("Failed to update profile.");
+    if (err.response?.status === 422) {
+      const errors = err.response.data.errors;
+      const allMessages = Object.values(errors).flat().join(" ");
+      setMessage(allMessages);
+    } else {
+      console.error("Update failed", err);
+      setMessage("Failed to update profile.");
+    }
   }
 };
 
 
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    window.location.href = "/login"; // redirect to login or homepage
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      console.log("Selected file:", file);
+      console.log("Preview:", URL.createObjectURL(file));
+      setProfilePhoto(file);
+    }
   };
+
+
+
+
+  const handleLogout = () => {
+    localStorage.removeItem("auth_token");
+    localStorage.removeItem("user");
+   window.location.href = "/feed";
+
+  };
+
+  
 
 
   useEffect(() => {
@@ -73,23 +119,42 @@ const handleChange = (e) => {
   if (!user) return <p>Loading profile...</p>;
 
   return (
-<div className="profile-container">
-   
-    
-    <div className="profile-page">
-      <div className="top-bar">
-    <button className="back-button1" onClick={() => window.location.href = "/"}>
-      ← Back to Home
-    </button>
-  </div>
-      <aside className="sidebar">
-        
-        <div className="user-info">
-          {/* <img
-            src="/default-profile.png" // Replace with dynamic photo if available
-            alt="Profile"
-            className="profile-pic"
-          /> */}
+    <div className="profile-container">
+
+
+        <div className="profile-page">
+          <div className="top-bar">
+        <button className="back-button1" onClick={() => window.location.href = "/feed"}>
+          ← Back to Home
+        </button>
+      </div>
+          <aside className="sidebar">
+
+            <div className="user-info">
+              <div className="profile-image-container">
+      <img
+        src={
+          user.Profile_photo
+            ? `http://localhost:8000/storage/${user.Profile_photo}`
+            : "/default-profile.png"
+        }
+        alt="Profile"
+        className="profile-avatar"
+      />
+      <label htmlFor="profile-upload" className="upload-btn">
+      Change Photo
+      </label>
+      <input
+        type="file"
+        id="profile-upload"
+        accept="image/*"
+        onChange={handlePhotoChange}
+        style={{ display: "none" }}
+      />
+
+    </div>
+
+
           <h3>{user.Name} {user.Lastname}</h3>
         </div>
         <ul className="sidebar-menu">
