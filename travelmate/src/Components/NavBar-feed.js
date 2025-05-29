@@ -2,14 +2,14 @@ import React from "react";
 import { FiCompass, FiBell, FiUser, FiLogOut } from "react-icons/fi";
 import { MdOutlineModeOfTravel } from "react-icons/md";
 import { NavLink } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext"; // Use auth context here
+import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import "../CSS/Style.css";
 
 const NavbarFeed = ({ onBellClick }) => {
   const { logout, user } = useAuth();
   const navigate = useNavigate();
-  if (!user) return null; // or loading indicator
+  if (!user) return null;
 
   const isAdmin = Number(user.Roleid) === 1;
 
