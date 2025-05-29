@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Message extends Model
 {
-    protected $primaryKey = 'messagesid'; 
+    protected $primaryKey = 'messagesid';
 
     protected $fillable = [
         'sender_id',
@@ -14,6 +14,12 @@ class Message extends Model
         'message',
         'read_at',
     ];
+
+    protected $casts = [
+        'read_at' => 'datetime',
+    ];
+
+    public $timestamps = true; // or false if not used
 
     public function sender()
     {

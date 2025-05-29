@@ -39,6 +39,7 @@ const AuthForms = () => {
     }
 
     localStorage.setItem("auth_token", token);
+    console.log(token);
     localStorage.setItem("user_id", user.Userid);
     localStorage.setItem("user_name", user.Name);
     localStorage.setItem("user", JSON.stringify(user));
@@ -50,7 +51,10 @@ const AuthForms = () => {
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:8000/api/login", loginData);
+      const res = await axios.post(
+        "http://localhost:8000/api/login",
+        loginData
+      );
       storeAuthInfo(res.data.user, res.data.token);
 
       setMessage("Login successful");

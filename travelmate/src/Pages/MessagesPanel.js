@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
-import "../CSS/Messages.css";
 import NavbarFeed from "../Components/NavBar-feed";
+import echo from "../echo";
+import "../CSS/Messages.css";
 
 const MessagesPage = () => {
   const [conversations, setConversations] = useState([]);
@@ -9,74 +10,106 @@ const MessagesPage = () => {
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
   const [searchParams] = useSearchParams();
+  const messagesEndRef = useRef(null);
 
   const token = localStorage.getItem("auth_token");
   const currentUser = JSON.parse(localStorage.getItem("user"));
   const currentUserId = currentUser?.Userid;
   const userParam = searchParams.get("user");
 
-  // Initialize static conversations and handle preselection via ?user=...
+  // Fetch users
   useEffect(() => {
-    const staticUsers = [
-      { id: 2, name: "Anjesa Haxhimusa" },
-      { id: 3, name: "Erza Tali" },
-      { id: 4, name: "Selvete Tali-Pajaziti" },
-    ];
-    setConversations(staticUsers);
-
-    const preselectUser = staticUsers.find(
-      (u) => String(u.id) === String(userParam)
-    );
-
-    if (preselectUser) {
-      setSelectedUser(preselectUser);
-    } else {
-      setSelectedUser(staticUsers[0]);
-    }
+    const fetchUsers = async () => {
+      try {
+        const res = await fetch("http://localhost:8000/api/users", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const users = await res.json();
+        const formatted = users.map((u) => ({
+          id: u.Userid,
+          name: `${u.Name} ${u.Lastname}`,
+        }));
+        setConversations(formatted);
+        const preselect = formatted.find(
+          (u) => String(u.id) === String(userParam)
+        );
+        setSelectedUser(preselect || formatted[0]);
+      } catch (err) {
+        console.error("Failed to fetch users:", err);
+      }
+    };
+    fetchUsers();
   }, [userParam]);
 
-  // Fetch messages for selected user and auto-poll
+  // Fetch messages between users
   useEffect(() => {
     if (!selectedUser) return;
+    setMessages([]); // clear previous messages
 
     const fetchMessages = async () => {
       try {
-        const res = await fetch("http://127.0.0.1:8000/api/messages", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const data = await res.json();
-
-        const filtered = data.filter(
-          (msg) =>
-            (msg.sender_id === currentUserId &&
-              msg.receiver_id === selectedUser.id) ||
-            (msg.sender_id === selectedUser.id &&
-              msg.receiver_id === currentUserId)
+        const res = await fetch(
+          `http://localhost:8000/api/messages/with/${selectedUser.id}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
         );
-
-        setMessages(filtered);
-
-        setTimeout(() => {
-          const chatBox = document.querySelector(".chat-messages");
-          if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
-        }, 100);
+        const data = await res.json();
+        const sorted = data.sort(
+          (a, b) => new Date(a.created_at) - new Date(b.created_at)
+        );
+        setMessages(sorted);
       } catch (err) {
-        console.error("Error fetching messages", err);
+        console.error("Message fetch failed:", err);
       }
     };
 
     fetchMessages();
-    const interval = setInterval(fetchMessages, 3000);
-    return () => clearInterval(interval);
   }, [selectedUser]);
 
+  // Echo listener
+  useEffect(() => {
+    if (!selectedUser || !currentUserId) return;
+
+    const channel = echo.private(`chat.${currentUserId}`);
+    channel.listen("MessageSent", (e) => {
+      const incoming = e.message;
+
+      const isDuplicate = messages.find((msg) =>
+        msg.messagesid && incoming.messagesid
+          ? msg.messagesid === incoming.messagesid
+          : msg.sender_id === incoming.sender_id &&
+            msg.receiver_id === incoming.receiver_id &&
+            msg.message === incoming.message &&
+            new Date(msg.created_at).getTime() ===
+              new Date(incoming.created_at).getTime()
+      );
+
+      if (
+        !isDuplicate &&
+        (incoming.sender_id === selectedUser.id ||
+          incoming.receiver_id === selectedUser.id)
+      ) {
+        console.log("📩 Message received via Echo:", incoming);
+        setMessages((prev) => [...prev, incoming]);
+      }
+    });
+
+    return () => {
+      echo.leave(`private-chat.${currentUserId}`);
+    };
+  }, [selectedUser, messages, currentUserId]);
+
+  // Auto-scroll to latest message
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  // Send message
   const sendMessage = async () => {
     if (!inputMessage.trim()) return;
-
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/messages", {
+      const res = await fetch("http://localhost:8000/api/messages", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -84,22 +117,21 @@ const MessagesPage = () => {
         },
         body: JSON.stringify({
           receiver_id: selectedUser.id,
-          message: inputMessage,
+          message: inputMessage.trim(),
         }),
       });
 
-      if (res.ok) {
-        const newMsg = await res.json();
-        setMessages((prev) => [...prev, newMsg]);
-        setInputMessage("");
-
-        setTimeout(() => {
-          const chatBox = document.querySelector(".chat-messages");
-          if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
-        }, 100);
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Server error:", res.status, errorText);
+        return;
       }
+
+      const newMsg = await res.json();
+      setMessages((prev) => [...prev, newMsg]);
+      setInputMessage("");
     } catch (err) {
-      console.error("Sending failed", err);
+      console.error("Sending failed:", err);
     }
   };
 
@@ -121,8 +153,6 @@ const MessagesPage = () => {
                 onClick={() => setSelectedUser(conv)}
               >
                 <strong>{conv.name}</strong>
-                <div className="last-message">Last chat...</div>
-                <div className="timestamp">recent</div>
               </div>
             ))}
           </div>
@@ -135,19 +165,20 @@ const MessagesPage = () => {
           </div>
 
           <div className="chat-messages">
-            {messages.map((msg) => (
+            {messages.map((msg, index) => (
               <div
-                key={msg.id}
+                key={`${msg.messagesid ?? `${msg.sender_id}-${msg.created_at}`}-${index}`}
                 className={`message ${
                   msg.sender_id === currentUserId ? "right" : "left"
                 }`}
               >
-                {msg.message}
-                {msg.sender_id === currentUserId && (
-                  <span className="seen-tag">✔ Sent</span>
+                <p>{msg.message}</p>
+                {msg.sender_id === currentUserId && msg.read_at && (
+                  <span className="read-receipt">✓ Read</span>
                 )}
               </div>
             ))}
+            <div ref={messagesEndRef} />
           </div>
 
           <div className="chat-input">
@@ -158,7 +189,7 @@ const MessagesPage = () => {
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && sendMessage()}
             />
-            <button onClick={sendMessage}>➤</button>
+            <button onClick={sendMessage}>Send</button>
           </div>
         </div>
       </div>
