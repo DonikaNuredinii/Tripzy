@@ -62,35 +62,9 @@ const MatchRequests = () => {
 
   return (
     <div className="match-requests-wrapper">
-      <h2>Match Notifications</h2>
+      <h2>Match Requests</h2>
 
-      {/* Notifications List */}
-      {notifications.length > 0 && (
-        <ul className="match-list">
-          {notifications.map((note) => (
-            <li
-              key={note.id}
-              className={`match-request ${note.type === "match_accepted" ? "accepted" : "rejected"}`}
-            >
-              <div className="match-info">
-                <strong>{note.message}</strong>
-                <p className="match-time">
-                  {new Date(note.created_at).toLocaleDateString()}
-                </p>
-              </div>
-              <div className="match-actions">
-                {note.type === "match_accepted" ? (
-                  <FiCheckCircle size={24} className="icon-btn accepted" />
-                ) : (
-                  <FiXCircle size={24} className="icon-btn denied" />
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {/* Match Requests */}
+      {/* Match Requests FIRST */}
       {requests.length === 0 ? (
         <p>No match activity yet.</p>
       ) : (
@@ -157,6 +131,37 @@ const MatchRequests = () => {
               );
             })}
         </ul>
+      )}
+
+      {/* Notifications SECOND */}
+      {notifications.length > 0 && (
+        <>
+          <h2>Notifications</h2>
+          <ul className="match-list">
+            {notifications.map((note) => (
+              <li
+                key={note.id}
+                className={`match-request ${
+                  note.type === "match_accepted" ? "accepted" : "rejected"
+                }`}
+              >
+                <div className="match-info">
+                  <strong>{note.message}</strong>
+                  <p className="match-time">
+                    {new Date(note.created_at).toLocaleDateString()}
+                  </p>
+                </div>
+                <div className="match-actions">
+                  {note.type === "match_accepted" ? (
+                    <FiCheckCircle size={24} className="icon-btn accepted" />
+                  ) : (
+                    <FiXCircle size={24} className="icon-btn denied" />
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </>
       )}
     </div>
   );

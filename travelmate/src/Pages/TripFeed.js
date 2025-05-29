@@ -11,7 +11,6 @@ const TripFeed = () => {
   const [showPostForm, setShowPostForm] = useState(false);
   const [activeCommentTripId, setActiveCommentTripId] = useState(null);
   const [error, setError] = useState("");
-  const [sentMatches, setSentMatches] = useState({});
 
   const fetchTrips = async () => {
     try {
@@ -30,29 +29,9 @@ const TripFeed = () => {
 
   useEffect(() => {
     fetchTrips();
-    fetchSentMatches();
   }, []);
 
-  const fetchSentMatches = async () => {
-    const token = localStorage.getItem("auth_token");
-    const userId = Number(localStorage.getItem("user_id"));
-    try {
-      const res = await axios.get("http://localhost:8000/api/trip-matches", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      const matchMap = {};
-      res.data.forEach((match) => {
-        if (match.sender_id === userId && match.Status !== "rejected") {
-          matchMap[match.Tripid] = match.Status.toLowerCase(); // 'pending' or 'accepted'
-        }
-      });
-
-      setSentMatches(matchMap);
-    } catch (err) {
-      console.error("Failed to fetch sent matches", err);
-    }
-  };
+  const userId = Number(localStorage.getItem("user_id"));
 
   const handleLike = async (tripId, alreadyLiked) => {
     const token = localStorage.getItem("auth_token");
@@ -108,6 +87,7 @@ const TripFeed = () => {
   };
 
   const currentUserName = localStorage.getItem("user_name");
+
   const handleMatch = async (tripId, tripOwnerId) => {
     const token = localStorage.getItem("auth_token");
 
@@ -119,27 +99,67 @@ const TripFeed = () => {
     try {
       const data = {
         tripid: tripId,
-        userid: tripOwnerId, // receiver
+        userid: tripOwnerId,
         status: "pending",
       };
 
-      const response = await axios.post(
-        "http://localhost:8000/api/trip-matches",
-        data,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      // Optimistically update UI
+      setTrips((prevTrips) =>
+        prevTrips.map((trip) => {
+          if (trip.Tripid !== tripId) return trip;
+
+          const fakeMatch = {
+            sender_id: userId,
+            Status: "pending",
+          };
+          console.log("Trip matches:", trip.matches);
+
+          return {
+            ...trip,
+            matches: [...(trip.matches || []), fakeMatch],
+          };
+        })
       );
 
-      console.log("Match request success:", response.data);
+      // Send to backend
+      await axios.post("http://localhost:8000/api/trip-matches", data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       alert("Match request sent!");
-      setSentMatches((prev) => ({ ...prev, [tripId]: "pending" }));
     } catch (err) {
       console.error("Error sending match request:", err.response?.data || err);
       alert("Failed to match. You may have already matched.");
     }
+  };
+
+  const getMatchButtonProps = (trip) => {
+    const matchRecord = trip.matches?.find(
+      (m) => Number(m.sender_id) === userId
+    );
+    const status = matchRecord?.Status?.toLowerCase();
+
+    if (status === "accepted") {
+      return {
+        label: "Matched",
+        disabled: true,
+        className: "match-sent match-sent-accepted",
+      };
+    } else if (status === "pending") {
+      return {
+        label: "Match Requested",
+        disabled: true,
+        className: "match-sent match-sent-requested",
+      };
+    }
+
+    return {
+      label: "💞 Match",
+      disabled: false,
+      className: "",
+    };
   };
 
   return (
@@ -167,6 +187,12 @@ const TripFeed = () => {
         <p>No trips posted yet.</p>
       ) : (
         trips.map((trip) => {
+          const {
+            label: matchLabel,
+            disabled: matchDisabled,
+            className: matchClass,
+          } = getMatchButtonProps(trip);
+
           const names =
             trip.likes?.map((like) => like.user?.Name).filter(Boolean) || [];
 
@@ -253,21 +279,11 @@ const TripFeed = () => {
                     {activeCommentTripId === trip.Tripid ? "Hide" : "Comment"}
                   </button>
                   <button
-                    className={`match-btn ${
-                      sentMatches[trip.Tripid] === "pending" ||
-                      sentMatches[trip.Tripid] === "accepted"
-                        ? "match-sent"
-                        : ""
-                    }`}
+                    className={`match-btn ${matchClass}`}
                     onClick={() => handleMatch(trip.Tripid, trip.user?.Userid)}
-                    disabled={sentMatches[trip.Tripid] === "pending"}
+                    disabled={matchDisabled}
                   >
-                    💞{" "}
-                    {sentMatches[trip.Tripid] === "accepted"
-                      ? "Matched"
-                      : sentMatches[trip.Tripid] === "pending"
-                        ? "Match Requested"
-                        : "Match"}
+                    {matchLabel}
                   </button>
                 </div>
               </div>

@@ -12,12 +12,28 @@ use Illuminate\Support\Facades\Storage;
 class TripController extends Controller
 {
     // GET /api/trips
-  public function index()
+public function index()
 {
-    return Trip::with(['user', 'photos', 'matches.sender', 'country', 'likes.user'])
-        ->withCount(['likes', 'comments'])
-        ->get();
+    $userId = auth()->id(); 
+
+    return Trip::with([
+        'user',
+        'photos',
+        'country',
+        'likes.user',
+
+        'matches' => function ($query) use ($userId) {
+            $query->where('sender_id', $userId)
+                  ->orWhere('Userid', $userId);
+        },
+
+        'matches.sender', 
+    ])
+    ->withCount(['likes', 'comments'])
+    ->get();
 }
+
+
 
 public function matches()
 {

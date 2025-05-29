@@ -43,6 +43,7 @@ const AuthForms = () => {
       localStorage.setItem("auth_token", res.data.token);
       localStorage.setItem("user_name", res.data.user.Name);
       localStorage.setItem("user_id", res.data.user.Userid);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
       setMessage("Login successful");
 
       const redirectPath = location.state?.from || "/feed";
@@ -79,6 +80,7 @@ const AuthForms = () => {
       localStorage.setItem("auth_token", loginRes.data.token);
       localStorage.setItem("user_name", loginRes.data.user.Name);
       localStorage.setItem("user_id", loginRes.data.user.Userid);
+      localStorage.setItem("user", JSON.stringify(loginRes.data.user));
       setMessage("Signup successful");
 
       const redirectPath = location.state?.from || "/feed";

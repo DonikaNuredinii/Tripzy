@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import "../CSS/Messages.css";
 import NavbarFeed from "../Components/NavBar-feed";
 
@@ -7,12 +8,14 @@ const MessagesPage = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
+  const [searchParams] = useSearchParams();
 
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("auth_token");
   const currentUser = JSON.parse(localStorage.getItem("user"));
   const currentUserId = currentUser?.Userid;
+  const userParam = searchParams.get("user");
 
-  // Sample static conversations for now
+  // Initialize static conversations and handle preselection via ?user=...
   useEffect(() => {
     const staticUsers = [
       { id: 2, name: "Anjesa Haxhimusa" },
@@ -20,10 +23,19 @@ const MessagesPage = () => {
       { id: 4, name: "Selvete Tali-Pajaziti" },
     ];
     setConversations(staticUsers);
-    setSelectedUser(staticUsers[0]);
-  }, []);
 
-  // Fetch messages on user change & poll
+    const preselectUser = staticUsers.find(
+      (u) => String(u.id) === String(userParam)
+    );
+
+    if (preselectUser) {
+      setSelectedUser(preselectUser);
+    } else {
+      setSelectedUser(staticUsers[0]);
+    }
+  }, [userParam]);
+
+  // Fetch messages for selected user and auto-poll
   useEffect(() => {
     if (!selectedUser) return;
 
@@ -45,14 +57,18 @@ const MessagesPage = () => {
         );
 
         setMessages(filtered);
+
+        setTimeout(() => {
+          const chatBox = document.querySelector(".chat-messages");
+          if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
+        }, 100);
       } catch (err) {
         console.error("Error fetching messages", err);
       }
     };
 
     fetchMessages();
-
-    const interval = setInterval(fetchMessages, 3000); // Poll every 3s
+    const interval = setInterval(fetchMessages, 3000);
     return () => clearInterval(interval);
   }, [selectedUser]);
 
@@ -76,6 +92,11 @@ const MessagesPage = () => {
         const newMsg = await res.json();
         setMessages((prev) => [...prev, newMsg]);
         setInputMessage("");
+
+        setTimeout(() => {
+          const chatBox = document.querySelector(".chat-messages");
+          if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
+        }, 100);
       }
     } catch (err) {
       console.error("Sending failed", err);
@@ -94,7 +115,9 @@ const MessagesPage = () => {
             {conversations.map((conv) => (
               <div
                 key={conv.id}
-                className={`conversation-item ${selectedUser?.id === conv.id ? "active" : ""}`}
+                className={`conversation-item ${
+                  selectedUser?.id === conv.id ? "active" : ""
+                }`}
                 onClick={() => setSelectedUser(conv)}
               >
                 <strong>{conv.name}</strong>
