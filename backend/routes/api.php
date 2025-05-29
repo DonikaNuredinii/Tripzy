@@ -18,6 +18,8 @@ use App\Models\User;
 use App\Models\Trip;
 use App\Models\TripMatch;
 use App\Models\TripComment;
+use Illuminate\Support\Facades\DB;
+
 
 
 Route::post('/debug-trip', function (Request $request) {
@@ -27,9 +29,9 @@ Route::post('/debug-trip', function (Request $request) {
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/trips', [TripController::class, 'index']);
-    Route::post('/trips', [TripController::class, 'store']);   // ✅ moved in
-    Route::put('/trips/{trip}', [TripController::class, 'update']); // ✅ moved in
-    Route::delete('/trips/{trip}', [TripController::class, 'destroy']); // ✅ moved in
+    Route::post('/trips', [TripController::class, 'store']);
+    Route::put('/trips/{trip}', [TripController::class, 'update']);
+    Route::delete('/trips/{trip}', [TripController::class, 'destroy']);
 
     Route::post('/trips/{tripId}/likes', [TripLikeController::class, 'store']);
     Route::delete('/trips/{tripId}/likes', [TripLikeController::class, 'destroy']);
@@ -65,17 +67,35 @@ Route::get('/test-api', function () {
     return response()->json(['status' => 'API working']);
 });
 Route::middleware('auth:sanctum')->get('/statistics', function () {
+    $mostLikedPosts = DB::table('trip_likes')
+        ->select('Tripid', DB::raw('COUNT(*) as like_count'))
+        ->groupBy('Tripid')
+        ->orderByDesc('like_count')
+        ->limit(5)
+        ->get();
+
+    $mostLikedPosts = $mostLikedPosts->map(function ($like) {
+        $title = DB::table('trips')->where('Tripid', $like->Tripid)->value('Title');
+        return [
+            'Tripid' => $like->Tripid,
+            'Title' => $title ?? 'Untitled',
+            'Likes' => $like->like_count,
+        ];
+    });
+
     return response()->json([
-        'totalUsers' => User::count(),
-        'totalTrips' => Trip::count(),
-        'totalMatches' => TripMatch::count(),
-        'totalComments' => TripComment::count(),
-        'topCountries' => Trip::select('Destination_country')
+        'totalUsers' => \App\Models\User::count(),
+        'totalTrips' => \App\Models\Trip::count(),
+        'totalMatches' => \App\Models\TripMatch::count(),
+        'totalComments' => \App\Models\TripComment::count(),
+
+        'topCountries' => \App\Models\Trip::select('Destination_country')
             ->groupBy('Destination_country')
             ->selectRaw('Destination_country, COUNT(*) as count')
             ->orderByDesc('count')
             ->take(5)
-            ->get()
-    ]);
-});         
+            ->get(),
 
+        'mostLikedPosts' => $mostLikedPosts,
+    ]);
+});
