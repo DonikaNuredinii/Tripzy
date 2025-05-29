@@ -2,13 +2,16 @@ import React from "react";
 import { FiCompass, FiBell, FiUser, FiLogOut } from "react-icons/fi";
 import { MdOutlineModeOfTravel } from "react-icons/md";
 import { NavLink } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../contexts/AuthContext"; // Use auth context here
 import { useNavigate } from "react-router-dom";
 import "../CSS/Style.css";
 
 const NavbarFeed = ({ onBellClick }) => {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const navigate = useNavigate();
+  if (!user) return null; // or loading indicator
+
+  const isAdmin = Number(user.Roleid) === 1;
 
   const handleLogout = () => {
     logout();
@@ -28,12 +31,14 @@ const NavbarFeed = ({ onBellClick }) => {
         <NavLink to="/feed" className="nav-link">
           Feed
         </NavLink>
-        <NavLink to="/explore" className="nav-link">
-          Explore
-        </NavLink>
         <NavLink to="/messages" className="nav-link">
           Messages
         </NavLink>
+        {isAdmin && (
+          <NavLink to="/dashboard" className="nav-link">
+            Dashboard
+          </NavLink>
+        )}
       </div>
 
       <div className="navbar-right">

@@ -32,8 +32,16 @@ const Statistics = () => {
   }, []);
 
   const pastelColors = [
-    "#A8DADC", "#FFE066", "#BFD8B8", "#FFD6E0", "#C4B0FF",
-    "#AED9E0", "#F8C8DC", "#FBE8A6", "#D6EADF", "#EADFF6"
+    "#A8DADC",
+    "#FFE066",
+    "#BFD8B8",
+    "#FFD6E0",
+    "#C4B0FF",
+    "#AED9E0",
+    "#F8C8DC",
+    "#FBE8A6",
+    "#D6EADF",
+    "#EADFF6",
   ];
 
   if (!stats) return <p>Loading statistics...</p>;
