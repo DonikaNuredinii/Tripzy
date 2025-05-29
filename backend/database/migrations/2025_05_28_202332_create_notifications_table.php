@@ -15,12 +15,14 @@ public function up()
 {
     Schema::create('notifications', function (Blueprint $table) {
         $table->id();
-       $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-        $table->string('type'); 
+        $table->unsignedBigInteger('user_id'); 
+
+        $table->string('type');
         $table->text('message');
         $table->timestamps();
 
         $table->foreign('user_id')->references('Userid')->on('users')->onDelete('cascade');
+
     });
 }
 
