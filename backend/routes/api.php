@@ -14,6 +14,11 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\TripLikeController;
 use Illuminate\Support\Facades\Log;
+use App\Models\User;
+use App\Models\Trip;
+use App\Models\TripMatch;
+use App\Models\TripComment;
+
 
 Route::post('/debug-trip', function (Request $request) {
     Log::info('Reached /debug-trip', $request->all());
@@ -59,3 +64,18 @@ Route::post('/messages', [MessageController::class, 'store']);
 Route::get('/test-api', function () {
     return response()->json(['status' => 'API working']);
 });
+Route::middleware('auth:sanctum')->get('/statistics', function () {
+    return response()->json([
+        'totalUsers' => User::count(),
+        'totalTrips' => Trip::count(),
+        'totalMatches' => TripMatch::count(),
+        'totalComments' => TripComment::count(),
+        'topCountries' => Trip::select('Destination_country')
+            ->groupBy('Destination_country')
+            ->selectRaw('Destination_country, COUNT(*) as count')
+            ->orderByDesc('count')
+            ->take(5)
+            ->get()
+    ]);
+});         
+
