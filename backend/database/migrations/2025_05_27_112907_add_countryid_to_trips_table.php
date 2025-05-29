@@ -17,11 +17,22 @@ return new class extends Migration {
 
 
     public function down()
-    {
-        Schema::table('trips', function (Blueprint $table) {
-            $table->dropForeign(['Countryid']);
-            $table->dropColumn('Countryid');
-        });
-    }
+{
+    Schema::table('trips', function (Blueprint $table) {
+        // Safe FK drop
+        DB::statement("
+            IF EXISTS (
+                SELECT * FROM sys.foreign_keys 
+                WHERE name = 'trips_destination_country_foreign'
+            )
+            ALTER TABLE trips DROP CONSTRAINT trips_destination_country_foreign
+        ");
+
+        if (Schema::hasColumn('trips', 'Destination_country')) {
+            $table->dropColumn('Destination_country');
+        }
+    });
+}
+
 };
 

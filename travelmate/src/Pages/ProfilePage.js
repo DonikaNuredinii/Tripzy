@@ -128,7 +128,7 @@ const ProfilePage = () => {
           ← Back to Home
         </button>
       </div>
-          <aside className="sidebar">
+          <aside className="sidebar-profile">
 
             <div className="user-info">
               <div className="profile-image-container">

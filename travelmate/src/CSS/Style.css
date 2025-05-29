@@ -1050,7 +1050,7 @@ button.liked {
 
 } */
 
-.sidebar {
+.sidebar-profile {
   width: 250px;
   background: #f4f4f4;
   padding: 20px;
@@ -1087,7 +1087,7 @@ button.liked {
   padding-left: 10px;
 }
 
-.sidebar {
+.sidebar-profile {
   width: 250px;
   background: #f4f4f4;
   padding: 20px;
@@ -1182,10 +1182,10 @@ button.liked {
 }
 
 .logout-button {
-  margin-top: 290px;
+  margin-top: 100px;
   width: 100%;
   padding: 10px;
-  background-color: #1d1d1d;
+  background-color: #140c06;
   color: white;
   border: none;
   border-radius: 6px;
@@ -1195,7 +1195,7 @@ button.liked {
 }
 
 .logout-button:hover {
-  background-color: #333;
+  background-color: #332011;
 }
 
 .back-button-wrapper {
@@ -1206,10 +1206,10 @@ button.liked {
 
 .profile-page {
   display: flex;
-  position: relative; /* Important to position the back button inside this */
+  position: relative;
   justify-content: center;
   align-items: flex-start;
-  padding-top: 40px; /* Add top padding to avoid overlap */
+  padding-top: 40px; 
 }
 
 .back-button1 {
@@ -1223,19 +1223,23 @@ button.liked {
 }
 
 .back-button1:hover {
-  color: #003366;
+  color: #332011;
 }
 
 .save-button {
   width: 100%;
   padding: 10px;
-  background-color: #1d1d1d;
+  background-color: #140c06;
   color: white;
   border: none;
   border-radius: 6px;
   font-size: 16px;
   cursor: pointer;
   transition: background-color 0.2s ease;
+}
+
+.save-button:hover{
+  background-color: #332011;
 }
 .trip-option select {
   width: 100%;

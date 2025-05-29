@@ -13,7 +13,6 @@ const AuthForms = () => {
   const location = useLocation();
 
   const [loginData, setLoginData] = useState({ Email: "", Password: "" });
-
   const [signupData, setSignupData] = useState({
     Name: "",
     Lastname: "",
@@ -32,23 +31,33 @@ const AuthForms = () => {
     setSignupData({ ...signupData, [e.target.name]: e.target.value });
   };
 
+  const storeAuthInfo = (user, token) => {
+    if (!token) {
+      console.error("⚠️ No token received from backend.");
+      setMessage("Login failed: Invalid token");
+      return;
+    }
+
+    localStorage.setItem("auth_token", token);
+    localStorage.setItem("user_id", user.Userid);
+    localStorage.setItem("user_name", user.Name);
+    localStorage.setItem("user", JSON.stringify(user));
+
+    console.log("✅ Token stored:", token);
+    login(user, token);
+  };
+
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(
-        "http://localhost:8000/api/login",
-        loginData
-      );
-      login(res.data.user, res.data.token);
-      localStorage.setItem("auth_token", res.data.token);
-      localStorage.setItem("user_name", res.data.user.Name);
-      localStorage.setItem("user_id", res.data.user.Userid);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
-      setMessage("Login successful");
+      const res = await axios.post("http://localhost:8000/api/login", loginData);
+      storeAuthInfo(res.data.user, res.data.token);
 
+      setMessage("Login successful");
       const redirectPath = location.state?.from || "/feed";
       navigate(redirectPath);
     } catch (err) {
+      console.error("Login failed:", err.response?.data || err.message);
       setMessage(err.response?.data?.message || "Login failed");
     }
   };
@@ -71,21 +80,19 @@ const AuthForms = () => {
         Birthdate: signupData.Birthdate,
       });
 
+      // Auto-login after successful signup
       const loginRes = await axios.post("http://localhost:8000/api/login", {
         Email: signupData.Email,
         Password: signupData.Password,
       });
 
-      login(loginRes.data.user, loginRes.data.token);
-      localStorage.setItem("auth_token", loginRes.data.token);
-      localStorage.setItem("user_name", loginRes.data.user.Name);
-      localStorage.setItem("user_id", loginRes.data.user.Userid);
-      localStorage.setItem("user", JSON.stringify(loginRes.data.user));
-      setMessage("Signup successful");
+      storeAuthInfo(loginRes.data.user, loginRes.data.token);
 
+      setMessage("Signup successful");
       const redirectPath = location.state?.from || "/feed";
       navigate(redirectPath);
     } catch (err) {
+      console.error("Signup failed:", err.response?.data || err.message);
       setMessage(err.response?.data?.message || "Signup failed");
     }
   };
@@ -115,7 +122,7 @@ const AuthForms = () => {
             </button>
           </form>
           <p>
-            Don't have an account?{" "}
+            Don’t have an account?{" "}
             <span onClick={() => setIsLogin(false)}>Sign up</span>
           </p>
         </div>
@@ -140,7 +147,7 @@ const AuthForms = () => {
             <input
               type="email"
               name="Email"
-              placeholder="Email Address"
+              placeholder="Email"
               onChange={handleSignupChange}
               required
             />

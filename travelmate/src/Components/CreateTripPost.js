@@ -92,7 +92,7 @@ const CreateTripPost = () => {
 
   const handleSubmit = async () => {
     const user = JSON.parse(localStorage.getItem("user"));
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("auth_token");
 
     if (!user || !token) {
       alert("Please log in first.");

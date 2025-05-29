@@ -21,34 +21,32 @@ Route::post('/debug-trip', function (Request $request) {
 });
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::apiResource('trip-matches', TripMatchController::class);
-    Route::get('/my-match-requests', [TripMatchController::class, 'myMatchRequests']);
-    Route::get('/notifications', [NotificationController::class, 'index']);
-
     Route::get('/trips', [TripController::class, 'index']);
+    Route::post('/trips', [TripController::class, 'store']);   // ✅ moved in
+    Route::put('/trips/{trip}', [TripController::class, 'update']); // ✅ moved in
+    Route::delete('/trips/{trip}', [TripController::class, 'destroy']); // ✅ moved in
+
     Route::post('/trips/{tripId}/likes', [TripLikeController::class, 'store']);
     Route::delete('/trips/{tripId}/likes', [TripLikeController::class, 'destroy']);
     Route::get('/trips/{tripId}/comments', [TripCommentController::class, 'index']);
     Route::post('/trips/{tripId}/comments', [TripCommentController::class, 'store']);
 
-    Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/me', function (Request $request) {
-        return $request->user()->load('role');
-    });
+    Route::apiResource('trip-matches', TripMatchController::class);
+    Route::get('/my-match-requests', [TripMatchController::class, 'myMatchRequests']);
+    Route::get('/notifications', [NotificationController::class, 'index']);
 
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/me', fn(Request $request) => $request->user()->load('role'));
+    Route::get('/user', fn(Request $request) => $request->user());
     Route::put('/users/{id}', [UserController::class, 'update']);
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
 });
+
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::get('/trips/{trip}', [TripController::class, 'show']);
-Route::post('/trips', [TripController::class, 'store']);
-Route::put('/trips/{trip}', [TripController::class, 'update']);
-Route::delete('/trips/{trip}', [TripController::class, 'destroy']);
+
 
 Route::apiResource('trip-photos', TripPhotoController::class);
 Route::apiResource('countries', CountryController::class);
