@@ -191,7 +191,7 @@ async function fillInput(driver, locator, value) {
         `⚠️ Standard click failed for Bell icon, trying JavaScript click`,
         clickErr.message
       );
-      await driver.executeScript("arguments[0].click();", bellIcon);
+      await driver.executeScript("arguments[1].click();", bellIcon);
       console.log("✅ Clicked the Bell icon (JavaScript click).");
     }
     await new Promise((resolve) => setTimeout(resolve, 2000));

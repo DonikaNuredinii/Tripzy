@@ -274,10 +274,13 @@ body {
 }
 
 .dashboard-container {
-  padding: 30px;
+  padding: 0 30px;
+  margin: 0;
   font-family: "Segoe UI", sans-serif;
   background-color: #f7f9fb;
-  overflow: hidden;
+  height: 100vh;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 .filter-bar {

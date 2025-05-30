@@ -47,8 +47,8 @@ require("chromedriver");
       await sleep(500);
     };
 
-    await fillInput("input[name='Email']", "rrona2004@gmail.com");
-    await fillInput("input[name='Password']", "Rrona12?");
+    await fillInput("input[name='Email']", "laida@gmail.com");
+    await fillInput("input[name='Password']", "Laida12?");
     console.log("✅ Filled login credentials");
 
     const submitBtn = await driver.findElement(By.css("button[type='submit']"));

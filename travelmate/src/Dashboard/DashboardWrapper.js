@@ -12,7 +12,7 @@ const DashboardWrapper = () => {
       }}
     >
       <Sidebar />
-      <div style={{ flex: 1, padding: "20px" }}>
+      <div style={{ flex: 1, padding: "0px" }}>
         <Outlet />
       </div>
     </div>
