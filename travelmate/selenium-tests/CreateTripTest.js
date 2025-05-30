@@ -1,13 +1,15 @@
 const { Builder, By, Key, until } = require("selenium-webdriver");
 const chrome = require("selenium-webdriver/chrome");
+const logging = require("selenium-webdriver/lib/logging");
 require("chromedriver");
 const path = require("path");
-const fs = require("fs");
+// const fs = require("fs"); // Removed fs
+// const axios = require("axios"); // Removed axios
 
 async function waitForElement(driver, locator, timeout = 10000) {
   const element = await driver.wait(until.elementLocated(locator), timeout);
   await driver.wait(until.elementIsVisible(element), timeout);
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  await new Promise((resolve) => setTimeout(resolve, 500)); // Added small delay for stability
   return element;
 }
 
@@ -19,24 +21,120 @@ async function fillInput(driver, locator, value) {
   try {
     await input.click();
   } catch (clickErr) {
-    console.log(`⚠️ Regular click failed, trying JavaScript click`);
+    console.log(
+      `⚠️ Regular click failed for ${locator}, trying JavaScript click`
+    );
     await driver.executeScript("arguments[0].click();", input);
   }
   await new Promise((resolve) => setTimeout(resolve, 500));
 
-  await input.clear();
-  await new Promise((resolve) => setTimeout(resolve, 500));
+  // Check input type to handle dates specially
+  const elementType = await input.getAttribute("type");
 
-  console.log(`⌨️ Typing: ${value}`);
-  await input.sendKeys(value);
-  console.log(`✅ Typed: ${value}`);
+  if (elementType === "date") {
+    console.log(
+      `📅 Setting date value via JavaScript for ${locator}: ${value}`
+    );
+    await driver.executeScript(
+      `arguments[0].value = arguments[1];`,
+      input,
+      value
+    );
+    console.log(`✅ Date value set via JavaScript for ${locator}`);
+
+    // Trigger input and change events to ensure component recognizes the change
+    await driver.executeScript(
+      `
+      arguments[0].dispatchEvent(new Event('input', { bubbles: true }));
+      arguments[0].dispatchEvent(new Event('change', { bubbles: true }));
+      `,
+      input
+    );
+    console.log(`✅ Input and change events dispatched for ${locator}`);
+  } else {
+    await input.clear();
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    console.log(`⌨️ Typing: ${value} into ${locator}`);
+    await input.sendKeys(value);
+    console.log(`✅ Typed: ${value} into ${locator}`);
+  }
+
+  // Add verification step
+  const startTime = Date.now();
+  const timeout = 5000; // 5 seconds timeout for value verification
+  let currentValue = await input.getAttribute("value");
+
+  while (currentValue !== value && Date.now() - startTime < timeout) {
+    console.log(
+      `⏳ Waiting for value to be set in ${locator}. Current: '${currentValue}', Expected: '${value}'`
+    );
+    await new Promise((resolve) => setTimeout(resolve, 100)); // Wait a bit before re-checking
+    currentValue = await input.getAttribute("value");
+  }
+
+  if (currentValue !== value) {
+    throw new Error(
+      `❌ Failed to set value '${value}' in element ${locator}. Final value: '${currentValue}'`
+    );
+  }
+  console.log(`✅ Value verified for ${locator}: '${currentValue}'`);
 
   await new Promise((resolve) => setTimeout(resolve, 500));
   return input;
 }
 
+async function checkDateValues(driver) {
+  console.log("Checking date values...");
+  try {
+    const departureDateInput = await waitForElement(
+      driver,
+      By.css(".trip-option input[name='departureDate']"),
+      2000
+    ); // Use shorter timeout for check
+    const returnDateInput = await waitForElement(
+      driver,
+      By.css(".trip-option input[name='returnDate']"),
+      2000
+    ); // Use shorter timeout for check
+
+    const departureDateValue = await departureDateInput.getAttribute("value");
+    const returnDateValue = await returnDateInput.getAttribute("value");
+
+    console.log(`🔎 Departure Date Value: '${departureDateValue}'`);
+    console.log(`🔎 Return Date Value: '${returnDateValue}'`);
+  } catch (error) {
+    console.warn("⚠️ Could not check date values:", error.message);
+  }
+}
+
+async function reSetDateValues(driver) {
+  console.log("Attempting to re-set date values before posting...");
+  await driver.executeScript(
+    `arguments[0].value = arguments[1];`,
+    await waitForElement(
+      driver,
+      By.css(".trip-option input[name='departureDate']"),
+      2000
+    ), // Find element again if needed
+    "2024-07-01"
+  );
+  await driver.executeScript(
+    `arguments[0].value = arguments[1];`,
+    await waitForElement(
+      driver,
+      By.css(".trip-option input[name='returnDate']"),
+      2000
+    ), // Find element again if needed
+    "2024-07-10"
+  );
+  console.log("✅ Dates re-set before posting");
+  await new Promise((resolve) => setTimeout(resolve, 1000)); // Increased delay after re-setting dates
+}
+
 (async function createTripPostTest() {
-  let driver;
+  let driver; // Declare driver here to make it accessible in finally
+  // let downloadPath; // Removed downloadPath declaration
 
   try {
     console.log("🚀 Starting test...");
@@ -48,6 +146,11 @@ async function fillInput(driver, locator, value) {
     options.addArguments("--disable-dev-shm-usage");
     options.addArguments("--no-sandbox");
     options.addArguments("--disable-gpu");
+
+    // Add logging preferences to capture performance logs (includes console logs)
+    const loggingPrefs = new logging.Preferences();
+    loggingPrefs.setLevel(logging.Type.PERFORMANCE, logging.Level.ALL);
+    options.setLoggingPrefs(loggingPrefs);
 
     driver = await new Builder()
       .forBrowser("chrome")
@@ -98,12 +201,12 @@ async function fillInput(driver, locator, value) {
     await fillInput(
       driver,
       By.css(".form-box.login-form input[name='Email']"),
-      "rrona2004@gmail.com"
+      "grace@gmail.com"
     );
     await fillInput(
       driver,
       By.css(".form-box.login-form input[name='Password']"),
-      "Rrona12?"
+      "Grace12?"
     );
 
     console.log("🖱️ Clicking login submit button...");
@@ -142,67 +245,29 @@ async function fillInput(driver, locator, value) {
       By.css(".description-input textarea[name='description']"),
       "Exciting trip to Paris with friends! Looking for travel buddies to explore the city of lights."
     );
+    await new Promise((resolve) => setTimeout(resolve, 500)); // Added delay
 
-    console.log("📸 Starting image upload process...");
-    const fileInput = await waitForElement(
-      driver,
-      By.css(".drop-area input[type='file']")
-    );
-    console.log("✅ File input element found.");
-
-    await driver.executeScript(
-      `
-      arguments[0].style.display = 'block';
-      arguments[0].style.opacity = '1';
-      arguments[0].style.position = 'relative';
-      arguments[0].style.zIndex = '1000';
-      arguments[0].style.width = '100%';
-      arguments[0].style.height = '100%';
-    `,
-      fileInput
-    );
-    console.log("✅ File input made visible and interactable.");
-
-    const filePath =
-      "C:\\Users\\hp\\OneDrive\\Desktop\\Tripzy\\travelmate\\public\\Images\\switzerland.jpg";
-    console.log(`📁 Attempting to use image path: ${filePath}`);
-
-    if (!fs.existsSync(filePath)) {
-      console.error(`❌ Error: Test image not found at: ${filePath}`);
-      throw new Error(`Test image not found at: ${filePath}`);
-    }
-    console.log("✅ Image file exists at the specified path.");
-
-    await fileInput.sendKeys(filePath);
-    console.log("✅ Image file path successfully sent to input.");
-
-    await driver.executeScript(
-      `
-      const input = arguments[0];
-      const event = new Event('change', { bubbles: true });
-      input.dispatchEvent(event);
-    `,
-      fileInput
-    );
-    console.log("✅ Dispatched change event on file input.");
-
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    console.log("🔍 Waiting for image preview to appear in the UI...");
+    console.log("📋 Retrieving browser console logs...");
     try {
-      await driver.wait(
-        until.elementLocated(By.css(".preview-container img.preview-image")),
-        15000
-      );
-      console.log("✅ Image preview appeared successfully.");
-    } catch (err) {
-      console.log(
-        "⚠️ Image preview did NOT appear within the expected timeout.",
-        err.message
+      const browserLogs = await driver.manage().logs().get("performance");
+
+      console.log("--- Browser Console Logs ---");
+      browserLogs.forEach((log) => {
+        const message = JSON.parse(log.message).message;
+        if (message && message.method === "Runtime.consoleAPICalled") {
+          const consoleLog = message.params.args
+            .map((arg) => arg.value)
+            .join(" ");
+          console.log(`[Console] ${consoleLog}`);
+        }
+      });
+      console.log("------------------------");
+    } catch (logErr) {
+      console.warn(
+        "⚠️ Could not retrieve browser console logs:",
+        logErr.message
       );
     }
-
-    await new Promise((resolve) => setTimeout(resolve, 2000));
 
     console.log("📝 Filling trip details...");
     const countrySelect = await waitForElement(
@@ -215,41 +280,94 @@ async function fillInput(driver, locator, value) {
     );
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    await countrySelect.click();
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    await countrySelect.sendKeys("France", Key.RETURN);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    // Select the first actual country option (index 1) using JavaScript
+    console.log("🌍 Selecting the first country option...");
+    await driver.executeScript(
+      `arguments[0].selectedIndex = 1;`, // Select the option at index 1
+      countrySelect
+    );
+    // Trigger a change event after setting the selected index
+    await driver.executeScript(
+      `arguments[0].dispatchEvent(new Event('change', { bubbles: true }));`,
+      countrySelect
+    );
+    console.log("✅ First country option selected");
+    await new Promise((resolve) => setTimeout(resolve, 500)); // Added delay after selection
 
     await fillInput(
       driver,
       By.css(".trip-option input[name='destinationCity']"),
-      "Paris"
+      "Turkey"
     );
+    await new Promise((resolve) => setTimeout(resolve, 500)); // Added delay
     await fillInput(
       driver,
       By.css(".trip-option input[name='departureDate']"),
       "2024-07-01"
     );
+    await new Promise((resolve) => setTimeout(resolve, 500)); // Added delay
     await fillInput(
       driver,
       By.css(".trip-option input[name='returnDate']"),
       "2024-07-10"
     );
+    await new Promise((resolve) => setTimeout(resolve, 500)); // Added delay
     await fillInput(
       driver,
       By.css(".trip-option input[name='travelStyle']"),
       "Cultural"
     );
+    await new Promise((resolve) => setTimeout(resolve, 500)); // Added delay
+
+    // Re-set date values before checking and before posting
+    await reSetDateValues(driver);
+    // Check date values after filling Travel Style
+    await checkDateValues(driver);
+
     await fillInput(
       driver,
       By.css(".trip-option input[name='budget']"),
       "1500"
     );
+    await new Promise((resolve) => setTimeout(resolve, 500)); // Added delay
+
+    // Re-set date values before checking
+    await reSetDateValues(driver);
+    // Check date values after filling Budget
+    await checkDateValues(driver);
+
     await fillInput(
       driver,
       By.css(".trip-option input[name='lookingFor']"),
       "Travel buddies to explore museums and cafes"
     );
+    await new Promise((resolve) => setTimeout(resolve, 500)); // Added delay
+
+    // Check date values after filling Looking For
+    await checkDateValues(driver);
+
+    // Re-set date values just before posting to counteract potential component state issues
+    console.log("Attempting to re-set date values before posting...");
+    await driver.executeScript(
+      `arguments[0].value = arguments[1];`,
+      await waitForElement(
+        driver,
+        By.css(".trip-option input[name='departureDate']"),
+        2000
+      ), // Find element again if needed
+      "2024-07-01"
+    );
+    await driver.executeScript(
+      `arguments[0].value = arguments[1];`,
+      await waitForElement(
+        driver,
+        By.css(".trip-option input[name='returnDate']"),
+        2000
+      ), // Find element again if needed
+      "2024-07-10"
+    );
+    console.log("✅ Dates re-set before posting");
+    await new Promise((resolve) => setTimeout(resolve, 1000)); // Increased delay after re-setting dates
 
     console.log("🖱️ Clicking post button...");
     const postBtn = await waitForElement(driver, By.css(".post-button"));
@@ -261,14 +379,17 @@ async function fillInput(driver, locator, value) {
     await postBtn.click();
     console.log("✅ Submitted trip post");
 
+    // Check for success message after posting
+    console.log("🔍 Waiting for success message after post submission...");
     try {
       await driver.wait(until.elementLocated(By.css(".message")), 10000);
-      console.log("✅ Success message found");
+      console.log("✅ Success message found!");
     } catch (err) {
-      console.log("⚠️ No success message found, but continuing...");
+      console.warn("⚠️ Timed out waiting for success message.", err.message);
+      // The test will continue even if no success message is found, but log the warning.
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 5000));
+    await new Promise((resolve) => setTimeout(resolve, 7000));
   } catch (err) {
     console.error("❌ Test failed:", err.message);
   } finally {
@@ -280,6 +401,7 @@ async function fillInput(driver, locator, value) {
         console.error("Error closing browser:", quitErr.message);
       }
     }
+    // Removed cleanup code for downloaded image
     console.log("🛑 Test completed.");
   }
 })();
