@@ -4,18 +4,6 @@ require("chromedriver");
 const path = require("path");
 const fs = require("fs");
 
-// Function to take screenshot
-async function takeScreenshot(driver, name) {
-  try {
-    const screenshot = await driver.takeScreenshot();
-    fs.writeFileSync(`${name}.png`, screenshot, "base64");
-    console.log(`📸 Screenshot saved as ${name}.png`);
-  } catch (err) {
-    console.error(`Failed to take screenshot ${name}:`, err.message);
-  }
-}
-
-// Function to wait for element
 async function waitForElement(driver, locator, timeout = 10000) {
   const element = await driver.wait(until.elementLocated(locator), timeout);
   await driver.wait(until.elementIsVisible(element), timeout);
@@ -23,7 +11,6 @@ async function waitForElement(driver, locator, timeout = 10000) {
   return element;
 }
 
-// Function to fill input field
 async function fillInput(driver, locator, value) {
   console.log(`🔍 Looking for input: ${locator}`);
   const input = await waitForElement(driver, locator);
@@ -54,7 +41,6 @@ async function fillInput(driver, locator, value) {
   try {
     console.log("🚀 Starting test...");
 
-    // Set up Chrome options
     const options = new chrome.Options();
     options.addArguments("--start-maximized");
     options.addArguments("--disable-notifications");
@@ -63,7 +49,6 @@ async function fillInput(driver, locator, value) {
     options.addArguments("--no-sandbox");
     options.addArguments("--disable-gpu");
 
-    console.log("⚙️ Initializing Chrome driver...");
     driver = await new Builder()
       .forBrowser("chrome")
       .setChromeOptions(options)
@@ -71,33 +56,31 @@ async function fillInput(driver, locator, value) {
 
     console.log("✅ Browser launched");
 
-    // Set window size
-    await driver.manage().window().setRect({ width: 1920, height: 1080 });
-    console.log("✅ Window size set");
+    await driver.manage().window().setRect({ width: 1280, height: 800 });
+    console.log("✅ Window size set to 1280x800");
 
-    // Set implicit wait time
     await driver.manage().setTimeouts({ implicit: 10000 });
 
-    // Navigate to the application
     console.log("🌐 Navigating to http://localhost:3000...");
     await driver.get("http://localhost:3000");
     console.log("✅ Page loaded");
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    // Take screenshot of initial page
-    await takeScreenshot(driver, "initial-page");
-
-    // Click login button in navbar
     console.log("🔍 Looking for login button in navbar...");
     const loginBtn = await waitForElement(driver, By.css(".navbar .login-btn"));
     console.log("✅ Found login button");
+
+    await driver.executeScript(
+      "arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });",
+      loginBtn
+    );
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     console.log("🖱️ Clicking login button...");
     await loginBtn.click();
     console.log("✅ Clicked 'Log In'");
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    // Wait for login section to be visible
     console.log("🔍 Waiting for login section...");
     const loginSection = await driver.wait(
       until.elementLocated(By.id("login-section")),
@@ -105,112 +88,179 @@ async function fillInput(driver, locator, value) {
     );
     console.log("✅ Login section is visible");
 
-    await takeScreenshot(driver, "after-login-click");
+    await driver.executeScript(
+      "arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });",
+      loginSection
+    );
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    // Fill in login form
     console.log("📝 Filling login form...");
     await fillInput(
       driver,
-      By.css(".login-form input[name='Email']"),
+      By.css(".form-box.login-form input[name='Email']"),
       "rrona2004@gmail.com"
     );
     await fillInput(
       driver,
-      By.css(".login-form input[name='Password']"),
+      By.css(".form-box.login-form input[name='Password']"),
       "Rrona12?"
     );
 
-    // Submit login form
     console.log("🖱️ Clicking login submit button...");
     const loginSubmitBtn = await waitForElement(
       driver,
-      By.css(".login-form button[type='submit']")
+      By.css(".form-box.login-form button.authbutton")
     );
     await loginSubmitBtn.click();
     console.log("✅ Submitted login form");
 
-    // Wait for redirect to feed page
     await driver.wait(until.urlContains("/feed"), 10000);
     console.log("✅ Successfully redirected to feed page");
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 3000));
 
-    // Click Add Trip button
     console.log("🔍 Looking for Add Trip button...");
-    const addTripBtn = await waitForElement(driver, By.css(".add-trip-btn"));
+    const addTripBtn = await waitForElement(
+      driver,
+      By.css(".trip-feed-header .add-trip-btn")
+    );
     console.log("✅ Found Add Trip button");
+
+    await driver.executeScript(
+      "arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });",
+      addTripBtn
+    );
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     console.log("🖱️ Clicking Add Trip button...");
     await addTripBtn.click();
     console.log("✅ Clicked Add Trip button");
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    // Fill in trip description
     console.log("📝 Filling trip description...");
     await fillInput(
       driver,
-      By.css("textarea[name='description']"),
+      By.css(".description-input textarea[name='description']"),
       "Exciting trip to Paris with friends! Looking for travel buddies to explore the city of lights."
     );
 
-    // Upload image directly using file input
-    console.log("📸 Uploading image...");
+    console.log("📸 Starting image upload process...");
     const fileInput = await waitForElement(
       driver,
-      By.css("input[type='file']")
+      By.css(".drop-area input[type='file']")
     );
-    // Make file input visible if it's hidden
+    console.log("✅ File input element found.");
+
     await driver.executeScript(
-      "arguments[0].style.display = 'block';",
+      `
+      arguments[0].style.display = 'block';
+      arguments[0].style.opacity = '1';
+      arguments[0].style.position = 'relative';
+      arguments[0].style.zIndex = '1000';
+      arguments[0].style.width = '100%';
+      arguments[0].style.height = '100%';
+    `,
       fileInput
     );
+    console.log("✅ File input made visible and interactable.");
+
     const filePath =
-      "C:\\Users\\hp\\OneDrive\\Desktop\\Tripzy\\travelmate\\public\\Images\\travel1.jpg";
-    console.log(`📁 Using image path: ${filePath}`);
+      "C:\\Users\\hp\\OneDrive\\Desktop\\Tripzy\\travelmate\\public\\Images\\switzerland.jpg";
+    console.log(`📁 Attempting to use image path: ${filePath}`);
+
+    if (!fs.existsSync(filePath)) {
+      console.error(`❌ Error: Test image not found at: ${filePath}`);
+      throw new Error(`Test image not found at: ${filePath}`);
+    }
+    console.log("✅ Image file exists at the specified path.");
+
     await fileInput.sendKeys(filePath);
-    console.log("✅ Image uploaded");
+    console.log("✅ Image file path successfully sent to input.");
+
+    await driver.executeScript(
+      `
+      const input = arguments[0];
+      const event = new Event('change', { bubbles: true });
+      input.dispatchEvent(event);
+    `,
+      fileInput
+    );
+    console.log("✅ Dispatched change event on file input.");
+
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    // Close file explorer if it's open
+    console.log("🔍 Waiting for image preview to appear in the UI...");
     try {
-      await driver.sendKeys(Key.ESCAPE);
-      console.log("✅ Closed file explorer");
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await driver.wait(
+        until.elementLocated(By.css(".preview-container img.preview-image")),
+        15000
+      );
+      console.log("✅ Image preview appeared successfully.");
     } catch (err) {
-      console.log("ℹ️ No file explorer to close");
+      console.log(
+        "⚠️ Image preview did NOT appear within the expected timeout.",
+        err.message
+      );
     }
 
-    // Fill in trip details
-    console.log("📝 Filling trip details...");
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    // Select country
+    console.log("📝 Filling trip details...");
     const countrySelect = await waitForElement(
       driver,
-      By.name("destinationCountry")
+      By.css(".trip-option select[name='destinationCountry']")
     );
+    await driver.executeScript(
+      "arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });",
+      countrySelect
+    );
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
     await countrySelect.click();
     await new Promise((resolve) => setTimeout(resolve, 500));
     await countrySelect.sendKeys("France", Key.RETURN);
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    // Fill other fields
-    await fillInput(driver, By.name("destinationCity"), "Paris");
-    await fillInput(driver, By.name("departureDate"), "2024-07-01");
-    await fillInput(driver, By.name("returnDate"), "2024-07-10");
-    await fillInput(driver, By.name("travelStyle"), "Cultural");
-    await fillInput(driver, By.name("budget"), "1500");
     await fillInput(
       driver,
-      By.name("lookingFor"),
+      By.css(".trip-option input[name='destinationCity']"),
+      "Paris"
+    );
+    await fillInput(
+      driver,
+      By.css(".trip-option input[name='departureDate']"),
+      "2024-07-01"
+    );
+    await fillInput(
+      driver,
+      By.css(".trip-option input[name='returnDate']"),
+      "2024-07-10"
+    );
+    await fillInput(
+      driver,
+      By.css(".trip-option input[name='travelStyle']"),
+      "Cultural"
+    );
+    await fillInput(
+      driver,
+      By.css(".trip-option input[name='budget']"),
+      "1500"
+    );
+    await fillInput(
+      driver,
+      By.css(".trip-option input[name='lookingFor']"),
       "Travel buddies to explore museums and cafes"
     );
 
-    // Submit the trip post
     console.log("🖱️ Clicking post button...");
     const postBtn = await waitForElement(driver, By.css(".post-button"));
+    await driver.executeScript(
+      "arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });",
+      postBtn
+    );
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     await postBtn.click();
     console.log("✅ Submitted trip post");
 
-    // Wait for success message or redirect
     try {
       await driver.wait(until.elementLocated(By.css(".message")), 10000);
       console.log("✅ Success message found");
@@ -221,7 +271,6 @@ async function fillInput(driver, locator, value) {
     await new Promise((resolve) => setTimeout(resolve, 5000));
   } catch (err) {
     console.error("❌ Test failed:", err.message);
-    await takeScreenshot(driver, "error-screenshot");
   } finally {
     if (driver) {
       try {

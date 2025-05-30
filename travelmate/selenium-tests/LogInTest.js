@@ -25,7 +25,7 @@ require("chromedriver");
     await loginBtn.click();
     console.log("✅ Clicked 'Log In'");
 
-    await sleep(1500); // wait for scroll
+    await sleep(1500);
 
     // Wait for login form
     const emailInput = await driver.wait(
@@ -34,7 +34,7 @@ require("chromedriver");
     );
     await driver.wait(until.elementIsVisible(emailInput), 10000);
 
-    // Helper to fill inputs
+    //Fill Input
     const fillInput = async (selector, value) => {
       const input = await driver.findElement(By.css(selector));
       await driver.executeScript(
@@ -60,8 +60,8 @@ require("chromedriver");
     await submitBtn.click();
     console.log("✅ Submitted login form");
 
-    await sleep(5000); // wait for redirection or message
-
+    await sleep(5000);
+    //End of Test
     console.log("✅ Login test completed");
   } catch (err) {
     console.error("❌ Test failed:", err.message);

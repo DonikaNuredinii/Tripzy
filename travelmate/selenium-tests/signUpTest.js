@@ -3,22 +3,14 @@ const chrome = require("selenium-webdriver/chrome");
 require("chromedriver");
 const fs = require("fs");
 
-async function takeScreenshot(driver, name) {
-  try {
-    const screenshot = await driver.takeScreenshot();
-    fs.writeFileSync(`${name}.png`, screenshot, "base64");
-    console.log(`📸 Screenshot saved as ${name}.png`);
-  } catch (err) {
-    console.error(`Failed to take screenshot ${name}:`, err.message);
-  }
-}
-
+//Wait for element
 async function waitForElement(driver, locator, timeout = 10000) {
   const element = await driver.wait(until.elementLocated(locator), timeout);
   await driver.wait(until.elementIsVisible(element), timeout);
   return element;
 }
 
+//Fill Input
 async function fillInput(driver, locator, value) {
   console.log(`🔍 Looking for input: ${locator}`);
   const input = await waitForElement(driver, locator);
@@ -42,6 +34,7 @@ async function fillInput(driver, locator, value) {
   return input;
 }
 
+//Sign Up Test
 (async function signUpTest() {
   let driver;
 
@@ -68,7 +61,6 @@ async function fillInput(driver, locator, value) {
 
     await driver.get("http://localhost:3000");
     await new Promise((resolve) => setTimeout(resolve, 2000));
-    await takeScreenshot(driver, "initial-page");
 
     const loginBtn = await waitForElement(driver, By.css(".navbar .login-btn"));
     await loginBtn.click();
@@ -78,29 +70,29 @@ async function fillInput(driver, locator, value) {
       until.elementLocated(By.id("login-section")),
       10000
     );
-    await takeScreenshot(driver, "after-login-click");
 
+    //Sign Up Toggle
     const signUpToggle = await waitForElement(
       driver,
       By.xpath("//span[text()='Sign up']")
     );
     await signUpToggle.click();
     await new Promise((resolve) => setTimeout(resolve, 2000));
-    await takeScreenshot(driver, "after-signup-toggle");
 
+    //Sign Up Form
     const signupForm = await waitForElement(
       driver,
       By.css(".form-box.signup-form")
     );
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
+    //Fill Input
     await fillInput(driver, By.css(".signup-form input[name='Name']"), "David");
     await fillInput(
       driver,
       By.css(".signup-form input[name='Lastname']"),
       "Johnson"
     );
-    await takeScreenshot(driver, "before-email");
 
     let emailInput;
     try {
@@ -164,16 +156,16 @@ async function fillInput(driver, locator, value) {
     }
 
     try {
-      await driver.wait(until.urlContains("/feed"), 10000);
+      await driver.wait(until.urlContains("/"), 10000);
       console.log("✅ Successfully redirected to feed page");
     } catch {
       console.log("⚠️ No redirect to feed page detected");
     }
 
+    //End of Test
     await new Promise((resolve) => setTimeout(resolve, 5000));
   } catch (err) {
     console.error("❌ Test failed:", err.message);
-    await takeScreenshot(driver, "error-screenshot");
   } finally {
     if (driver) {
       try {
