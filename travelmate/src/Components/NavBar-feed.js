@@ -51,7 +51,7 @@ const NavbarFeed = ({ onBellClick }) => {
           <FiUser className="nav-icon" />
         </NavLink>
         <FiLogOut
-          className="nav-icon"
+          className="nav-icon log"
           title="Logout"
           onClick={handleLogout}
           style={{ cursor: "pointer", marginLeft: "auto" }}
